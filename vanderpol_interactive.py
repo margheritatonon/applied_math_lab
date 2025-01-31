@@ -68,7 +68,7 @@ def mouse_click(event: MouseEvent):
     else:
         return
     
-    solution = solve_ivp(ode, t_span, initial_conditions)
+    solution = solve_ivp(ode, t_span, initial_conditions, t_eval=np.linspace(0, 100, 1000))
     xvals_sol = solution.y[0]
     yvals_sol = solution.y[1]
     y = solution.y
