@@ -28,31 +28,43 @@ ax1.set_xlabel("x")
 ax1.set_ylabel("y")
 ax1.set_title("Phase Plane Analysis")
 ax1.legend()
+ax1.set_xlim(-4, 4)
+ax1.set_ylim(-4, 4)
 
 #plotting the x versus t
 (plot_time,) = ax2.plot([], [])
 ax2.set_title("Time Series")
 ax2.set_xlabel("t")
 ax2.set_ylabel("x")
+ax2.set_ylim(-4, 4)
+ax2.set_xlim(0, 100)
 
-def animate(i, xy, x_nullcline, y_nullcline, fsolve_res):
-    if xy is None:
+animation_data = [None, None, None, None, None] #globally storing variables
+
+def animate(i):
+    xy = animation_data[0]
+    x_nullcline = animation_data[1]
+    y_nullcline = animation_data[2]
+    fsolve_res = animation_data[3] #taking the values from the animation data list
+    t_eval = animation_data[4]
+
+    if xy is None or x_nullcline is None or y_nullcline is None or fsolve_res is None:
         return ()
-    
     plot_xnullcline.set_data(x_nullcline[0], x_nullcline[1])
     plot_ynullcline.set_data(y_nullcline[0], y_nullcline[1])
     plot_fixedpoint.set_data([fsolve_res[0]], [fsolve_res[1]])
     plot_trajectory.set_data(xy[0][:i], xy[1][:i])
-    plot_time.set_data(t_span[: i + 1], xy[0][: i + 1])
+    plot_time.set_data(t_eval[:i+1], xy[0][:i+1])
     return (plot_trajectory, plot_xnullcline, plot_ynullcline, plot_fixedpoint, plot_time)
 
 anim = animation.FuncAnimation(fig, animate, interval = 1, blit = False)
-anim.event_source.stop()
+anim.event_source.stop() #prevents animation from running until the user presses
 
 def mouse_click(event: MouseEvent):
     if event.inaxes == ax1:
         initial_conditions[0] = event.xdata #lists are mutable so this is going to change the initial conditions
         initial_conditions[1] = event.ydata
+        print(initial_conditions)
     else:
         return
     
@@ -116,14 +128,22 @@ def mouse_click(event: MouseEvent):
     fsolve_res = fsolve(derivatives, x0 = np.array([0,0]))
     print(fsolve_res) #this is the root, which is the critical/fixed point.
 
+    #globally updating variables with mutability property of lists
+    animation_data[0] = solution.y
+    animation_data[1] = x_null
+    animation_data[2] = y_null
+    animation_data[3] = fsolve_res
+    animation_data[4] = solution.t
+
+
     #handling the animation so that it restarts on click
     anim.event_source.stop()
     anim.frame_seq = anim.new_frame_seq()
-    anim._args = (y, x_null, y_null, fsolve_res)
     anim.event_source.start()
+    fig.canvas.draw_idle()
 
-    #connecting:
-    fig.canvas.mpl_connect("button_press_event", mouse_click)
+#connecting:
+fig.canvas.mpl_connect("button_press_event", mouse_click)
 
-    #show plot
-    plt.show()
+#show plot
+plt.show()
