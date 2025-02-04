@@ -8,7 +8,7 @@ uv = np.ones((2,40))
 uv = uv + np.random.uniform(0, 1, (2, 40))/100 #adding noise
 
 #parameters
-a = 4
+a = 0.4
 d = 20
 d1 = 1
 d2 = d
@@ -19,16 +19,12 @@ def pde(t, uv):
     u, v = uv
 
     #computing laplacians
-    lap_u = []
-    lap_v = []
-    for i in range(len(u)):
-        if i != 0 and i != (len(u)-1):
-            lapu = u[i-1] - 2* u[i] + u[i+1]
-            lap_u.append(lapu)
-    for i in range(len(v)):
-        if i != 0 and i != (len(v)-1):
-            lapv = v[i-1] - 2* v[i] + v[i+1]
-            lap_v.append(lapv) 
+    u_plus = np.roll(u, shift = 1)
+    u_min = np.roll(u, shift = -1)
+    v_plus = np.roll(v, shift = 1)
+    v_min = np.roll(v, shift = -1)
+    lap_u = u_plus - 2*u + u_min
+    lap_v = v_plus - 2*v + v_min
 
     #the functions:
     f = a - b*u + (u**2)/v
@@ -39,3 +35,35 @@ def pde(t, uv):
     vt = d2 * lap_v + gam * g
 
     return (ut, vt)
+
+#integrating the system numerically
+#uv are the initial conditions
+
+
+dt = 0.01
+uarr_updates = []
+varr_updates = []
+for i in range(50000):
+    ut, vt = pde(1, uv) #t = 1 because it doesnt play a role in computing the pdes
+    #updating with eulers method
+    uarr_updates.append(uv[0])
+    uv[0] = uv[0] + ut * dt
+
+    varr_updates.append(uv[1])
+    uv [1] = uv[1] + vt * dt
+
+    #boundary conditions:
+    uv[:, 0] = uv[:, 1]
+    uv[:, -1] = uv[:, -2]
+
+#static plot:
+x_arr = np.linspace(0, 40, 40)
+print(f"x_arr = {x_arr.shape}")
+print(f"uv[1] = {uv[1].shape}")
+fig, ax = plt.subplots(1, 1)
+plt.plot(x_arr, uv[1])
+ax.set_xlim((0, 40))
+ax.set_ylim((0, 5))
+plt.xlabel("x")
+plt.ylabel("v(x)")
+plt.show()
