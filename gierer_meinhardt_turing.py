@@ -18,13 +18,6 @@ def is_turing_instability(a: np.array, b:float, d:np.array):
         np.array
         An array with elements "True" if the combination of parameters forms the necessary conditions for Turing instability and elements "False" if otherwise.
     """
-
-    #first, we need to define u and v and the partial derivatives: 
-    #defining u and v
-    uv = np.ones((2,1000))
-    uv = uv + np.random.uniform(0, 1, (2, 1000))/100 #adding noise
-    u, v = uv
-
     #partial derivatives (computed by hand) evaluated at the fixed points (when f and g equal 0)
     fu = 2 * b / (a + 1) - b
     fv = -((b / (a + 1)) ** 2)
@@ -59,15 +52,23 @@ print(mask_turing.shape)
 print(mask_turing[100])
 
 
-fig, ax = plt.subplots(1, 1)
-plt.xlabel("a")
-plt.ylabel("d")
-plt.title("Turing Space")
-cmap_red_green = ListedColormap(["#69dd5d", "#dd5d5d"])
-plt.contourf(mesh_a, mesh_d, mask_turing, cmap = cmap_red_green)
-#adding a legend based on the colors
-stable_patch = mpatches.Patch(color="#69dd5d", label="Stable")
-unstable_patch = mpatches.Patch(color="#dd5d5d", label="Unstable")
-plt.legend(handles=[stable_patch, unstable_patch], loc="upper right")
+def plot_turing_space():
+    fig, ax = plt.subplots(1, 1)
+    plt.xlabel("a")
+    plt.ylabel("d")
+    plt.title("Turing Space")
+    cmap_red_green = ListedColormap(["#69dd5d", "#dd5d5d"])
+    plt.contourf(mesh_a, mesh_d, mask_turing, cmap = cmap_red_green)
+    #adding a legend based on the colors
+    stable_patch = mpatches.Patch(color="#69dd5d", label="Stable")
+    unstable_patch = mpatches.Patch(color="#dd5d5d", label="Unstable")
+    plt.legend(handles=[stable_patch, unstable_patch], loc="upper right")
+    plt.show()
 
-plt.show()
+
+
+if __name__ == "__main__":
+    plot_turing_space()
+
+
+#we could also try to animate this and plot for different values of b to see how the region evolves
