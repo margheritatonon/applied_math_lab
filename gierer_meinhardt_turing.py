@@ -2,41 +2,25 @@ import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 
-def is_turing_instability(a: float, b:float, d:float):
+def is_turing_instability(a: np.array, b:float, d:np.array):
     """
     A function that returns True if we have the necessary Turing instability conditions based on parameters a, b, d in the Gierer Meinhardt model, and False otherwise.
 
     Parameters:
-        a: float
+        a: np.array
         b: float
-        d: float
+        d: np.array
         
     Returns:
-        True if the necessary conditions for a Turing instability are met.
-        False otherwise
+        np.array
+        An array with elements "True" if the combination of parameters forms the necessary conditions for Turing instability and elements "False" if otherwise.
     """
 
-    #first, we need to solve the PDE: 
+    #first, we need to define u and v and the partial derivatives: 
     #defining u and v
-    uv = np.ones((2,40))
-    uv = uv + np.random.uniform(0, 1, (2, 40))/100 #adding noise
+    uv = np.ones((2,1000))
+    uv = uv + np.random.uniform(0, 1, (2, 1000))/100 #adding noise
     u, v = uv
-    #computing laplacians
-    u_plus = np.roll(u, shift = 1)
-    u_min = np.roll(u, shift = -1)
-    v_plus = np.roll(v, shift = 1)
-    v_min = np.roll(v, shift = -1)
-    lap_u = u_plus - 2*u + u_min
-    lap_v = v_plus - 2*v + v_min
-    #the functions from Gierer Meinhardt model:
-    f = a - b*u + (u**2)/v
-    g = u**2 - v
-    #the pdes:
-    ut = lap_u + f #D1 = 1, gamma = 1 (as stated in the problem of the assignment)
-    vt = d * lap_v + g
-    #ut and vt are the PDEs (numerical values)
-
-
 
     #partial derivatives (computed by hand)
     fu = - b + 2*u / v
@@ -50,10 +34,21 @@ def is_turing_instability(a: float, b:float, d:float):
     leftside = gv + (d * fu)
     rightside = 2 * ((d)**(1/2)) * ((det)**(1/2))
 
+
     #now we check if the conditions are met (also need d > 0):
-    if d >= 0 and trace < 0 and det > 0 and leftside > rightside and rightside > 0:
-        return True
-    
-    else:
-        return False
-    
+    truth_array = (d > 0) & (trace < 0) & (det > 0) & (leftside > rightside) & (rightside > 0)
+
+    return truth_array
+
+
+#now we plot a heatmap 
+#we let b = 1
+a_vals = np.linspace(0, 1, 1000)
+d_vals = np.linspace(0, 100, 1000)
+#for each of these combinations of values, we want to check if we have a turing instability.
+
+#create a mesh grid to compute the turing instability in the entire plane
+mesh_a, mesh_d = np.meshgrid(a_vals, d_vals)
+#1000 by 1000 arrays: 1000 arrays with 1000 elements each
+mask_turing = is_turing_instability(mesh_a, 1, mesh_d)
+print(mask_turing.shape)
