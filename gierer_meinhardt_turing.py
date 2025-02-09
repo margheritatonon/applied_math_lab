@@ -1,6 +1,9 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+import matplotlib.patches as mpatches
+
 
 def is_turing_instability(a: np.array, b:float, d:np.array):
     """
@@ -22,11 +25,11 @@ def is_turing_instability(a: np.array, b:float, d:np.array):
     uv = uv + np.random.uniform(0, 1, (2, 1000))/100 #adding noise
     u, v = uv
 
-    #partial derivatives (computed by hand)
-    fu = - b + 2*u / v
-    fv = - (u**2)/(v**2)
-    gu = 2*u
-    gv = -1
+    #partial derivatives (computed by hand) evaluated at the fixed points (when f and g equal 0)
+    fu = 2 * b / (a + 1) - b
+    fv = -((b / (a + 1)) ** 2)
+    gu = 2 * (a + 1) / b
+    gv = -1.0
 
     #defining the conditions
     trace = fu + gv
@@ -50,5 +53,21 @@ d_vals = np.linspace(0, 100, 1000)
 #create a mesh grid to compute the turing instability in the entire plane
 mesh_a, mesh_d = np.meshgrid(a_vals, d_vals)
 #1000 by 1000 arrays: 1000 arrays with 1000 elements each
-mask_turing = is_turing_instability(mesh_a, 1, mesh_d)
+b = 1
+mask_turing = is_turing_instability(mesh_a, b, mesh_d)
 print(mask_turing.shape)
+print(mask_turing[100])
+
+
+fig, ax = plt.subplots(1, 1)
+plt.xlabel("a")
+plt.ylabel("d")
+plt.title("Turing Space")
+cmap_red_green = ListedColormap(["#69dd5d", "#dd5d5d"])
+plt.contourf(mesh_a, mesh_d, mask_turing, cmap = cmap_red_green)
+#adding a legend based on the colors
+stable_patch = mpatches.Patch(color="#69dd5d", label="Stable")
+unstable_patch = mpatches.Patch(color="#dd5d5d", label="Unstable")
+plt.legend(handles=[stable_patch, unstable_patch], loc="upper right")
+
+plt.show()
