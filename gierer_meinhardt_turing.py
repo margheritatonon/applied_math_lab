@@ -1,8 +1,8 @@
 import numpy as np
-from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import matplotlib.patches as mpatches
+from numpy import linalg
 
 
 def is_turing_instability(a: np.array, b:float, d:np.array):
@@ -48,15 +48,15 @@ mesh_a, mesh_d = np.meshgrid(a_vals, d_vals)
 #1000 by 1000 arrays: 1000 arrays with 1000 elements each
 b = 1
 mask_turing = is_turing_instability(mesh_a, b, mesh_d)
-print(mask_turing.shape)
-print(mask_turing[100])
+#print(mask_turing.shape)
+#print(mask_turing[100])
 
 
 def plot_turing_space():
     fig, ax = plt.subplots(1, 1)
     plt.xlabel("a")
     plt.ylabel("d")
-    plt.title("Turing Space")
+    plt.title(f"Turing Space for b = {b}")
     cmap_red_green = ListedColormap(["#69dd5d", "#dd5d5d"])
     plt.contourf(mesh_a, mesh_d, mask_turing, cmap = cmap_red_green)
     #adding a legend based on the colors
@@ -65,10 +65,48 @@ def plot_turing_space():
     plt.legend(handles=[stable_patch, unstable_patch], loc="upper right")
     plt.show()
 
+plot_turing_space()
+
+def find_leading_spatial_modes(a:float, b:float, d:float, length:float, number_of_modes:int):
+    #partial derivatives (computed by hand) evaluated at the fixed points (when f and g equal 0)
+    fu = 2 * b / (a + 1) - b
+    fv = -((b / (a + 1)) ** 2)
+    gu = 2 * (a + 1) / b
+    gv = -1.0
+
+    jacobian = np.array([[fu, fv], [gu, gv]])
+
+    range = np.arange(0, number_of_modes)
+    max_real_temp_eigvals = []
+    for n in range: #finding the temporal eigenvalues
+        lambda_n = ((np.pi * (n+1)) / length) ** 2 #assuming dirichlet boundary conditions
+        D_matrix = np.diag([1, d])
+        A_n = jacobian - lambda_n * D_matrix
+        egival1, eigval2 = np.linalg.eigvals(A_n)
+        real1 = egival1.real
+        real2 = eigval2.real
+        max_eigval = max(real1, real2)
+        max_real_temp_eigvals.append(max_eigval)
+    
+    sorted = np.argsort(max_real_temp_eigvals)[::-1] #from biggest to smallest
+    #print(max_real_temp_eigvals)
+    unstable_modes_indices = sorted[np.array(max_real_temp_eigvals)[sorted] > 0] 
+    return unstable_modes_indices
+
+#question 3 from assignment
+ex1 = find_leading_spatial_modes(0.4, 1, 30, 40, 10)
+print(f"Leading spatial modes for d = 30 are: {ex1}")
+print(f"Turing instability present: {is_turing_instability(0.4, 1, 30)}")
+#n=4 is the leading spatial mode: find Fn and Gn
+
+ex2 = find_leading_spatial_modes(0.4, 1, 20, 40, 10)
+print(f"Leading spatial modes for d = 20 are: {ex2}")
+print(f"Turing instability present: {is_turing_instability(0.4, 1, 20)}")
+    
 
 
-if __name__ == "__main__":
-    plot_turing_space()
+#if __name__ == "__main__":
+#    plot_turing_space()
 
 
 #we could also try to animate this and plot for different values of b to see how the region evolves
