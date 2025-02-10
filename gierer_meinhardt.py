@@ -1,11 +1,8 @@
 import numpy as np
-from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.backend_bases import MouseEvent
 
-uv = np.ones((2,40)) #homogeneous stationary solution 
-uv = uv + np.random.uniform(0, 1, (2, 40))/100 #1% amplitude additive noise
 
 #parameters
 a = 0.4
@@ -15,14 +12,26 @@ d2 = d
 gam = 1
 b = 1
 
-def pde(t, uv):
+def spatial_part(N:int = 40, dx:float = 1):
+    """
+    Implements a 1D finite difference numerical approximation to integrate the spatial part of the reaction-diffusion equations.
+    Parameters:
+        N: the number of spatial points in the discretization
+        dx: the spatial step
+    Returns:
+        A tuple (uv, ut, vt)
+        uv: the initial homogeneous stationary solution with 1% amplitude additive noise
+        ut and vt: the PDEs
+    """
+    uv = np.ones((2,N)) #homogeneous stationary solution 
+    uv = uv + np.random.uniform(0, 1, (2, 40))/100 #1% amplitude additive noise
     u, v = uv
 
-    #computing laplacians
-    u_plus = np.roll(u, shift = 1)
-    u_min = np.roll(u, shift = -1)
-    v_plus = np.roll(v, shift = 1)
-    v_min = np.roll(v, shift = -1)
+    #computing laplacians - we are applying the 1D finite difference numerical scheme
+    u_plus = np.roll(u, shift = dx)
+    u_min = np.roll(u, shift = -dx)
+    v_plus = np.roll(v, shift = dx)
+    v_min = np.roll(v, shift = -dx)
     lap_u = u_plus - 2*u + u_min
     lap_v = v_plus - 2*v + v_min
 
@@ -34,21 +43,29 @@ def pde(t, uv):
     ut = d1 * lap_u + gam * f
     vt = d2 * lap_v + gam * g
 
-    return (ut, vt)
+    return (uv, ut, vt)
 
 #integrating the system numerically
 #uv are the initial conditions
 
-def eulers_method_pde(uv):
+uv, ut, vt = spatial_part()
+print(f"uv.shape = {uv.shape}")
+print(f"uv[0].shape = {uv[0].shape}")
+print(f"ut.shape = {ut.shape}")
+print(f"vt.shape = {vt.shape}")
+print(f"uv[0] + ut * dt shape = {(uv[0] + ut * 0.01).shape}")
+
+def eulers_method_pde(dt:float=0.01):
     """
-    Numerically integrates array uv using Explicit Euler's method.
+    Numerically integrates array uv obtained from spatial_part function using Explicit Euler's method.
+    Parameters:
+        dt: float specifying the time step for numerical integration.
     Returns a tuple of lists with 100 elements (frames) each.
     """
-    dt = 0.01
     uarr_updates = []
     varr_updates = []
     for i in range(50000):
-        ut, vt = pde(1, uv) #t = 1 because it doesnt play a role in computing the pdes
+        uv, ut, vt = spatial_part() 
         #updating with explicit eulers method
         if i % 500 == 0: #appending every 500 iterations
             uarr_updates.append(uv[0])
@@ -56,7 +73,7 @@ def eulers_method_pde(uv):
 
         if i % 500 == 0:
             varr_updates.append(uv[1])
-        uv [1] = uv[1] + vt * dt
+        uv[1] = uv[1] + vt * dt
 
         #boundary conditions:
         uv[:, 0] = uv[:, 1]
@@ -64,10 +81,10 @@ def eulers_method_pde(uv):
     
     return (uarr_updates, varr_updates)
 
-uarr_updates, varr_updates = eulers_method_pde(uv)
-print(uv[0].shape)
-print(len(uarr_updates[-1]))
-print(len(uarr_updates))
+uarr_updates, varr_updates = eulers_method_pde()
+print(f"uv[0].shape = {uv[0].shape}")
+print(f"len(uarr_updates[-1]) = {len(uarr_updates[-1])}")
+print(f"len(uarr_updates) = {len(uarr_updates)}")
 
 def plot_static():
     """
