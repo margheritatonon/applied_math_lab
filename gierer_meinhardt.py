@@ -109,7 +109,7 @@ def plot_static():
     plt.ylabel("v(x)")
     plt.show()
 
-plot_static()
+#plot_static()
 
 print(varr_updates[0])
 print(varr_updates[1])
@@ -125,7 +125,9 @@ def update(frame):
     plot_v.set_ydata(varr_updates[frame])  
     return plot_v,
 
-ani = animation.FuncAnimation(fig, update, frames=len(varr_updates), interval=1, blit=False)
+ani = animation.FuncAnimation(fig, update, frames=len(varr_updates), interval=150, blit=True)
 plt.xlabel("x")
 plt.ylabel("v")
-#plt.show()
+ax.set_xlim((0, 40))
+ax.set_ylim((0, 5))
+plt.show()
