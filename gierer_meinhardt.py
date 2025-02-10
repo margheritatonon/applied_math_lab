@@ -117,17 +117,23 @@ print(varr_updates[2])
 print(varr_updates[0] == varr_updates[10])
 
 #now we want to animate the 100 frames we have instead of statically plotting the last frame.
-fig, ax = plt.subplots(1, 1)
-x_arr = np.linspace(0, 40, 40) 
-(plot_v,) = ax.plot(x_arr, varr_updates[0]) 
+def animate_plot():
+    """
+    Animates the plot of the numerically integrated solution.
+    """
+    fig, ax = plt.subplots(1, 1)
+    x_arr = np.linspace(0, 40, 40) 
+    (plot_v,) = ax.plot(x_arr, varr_updates[0]) 
 
-def update(frame):
-    plot_v.set_ydata(varr_updates[frame])  
-    return plot_v,
+    def update(frame):
+        plot_v.set_ydata(varr_updates[frame])  
+        return plot_v,
 
-ani = animation.FuncAnimation(fig, update, frames=len(varr_updates), interval=150, blit=True)
-plt.xlabel("x")
-plt.ylabel("v")
-ax.set_xlim((0, 40))
-ax.set_ylim((0, 5))
-plt.show()
+    ani = animation.FuncAnimation(fig, update, frames=len(varr_updates), interval=150, blit=True)
+    plt.xlabel("x")
+    plt.ylabel("v")
+    ax.set_xlim((0, 40))
+    ax.set_ylim((0, 4))
+    plt.show()
+
+animate_plot()
