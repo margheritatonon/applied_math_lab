@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.backend_bases import MouseEvent
 
-uv = np.ones((2,40))
-uv = uv + np.random.uniform(0, 1, (2, 40))/100 #adding noise
+uv = np.ones((2,40)) #homogeneous stationary solution 
+uv = uv + np.random.uniform(0, 1, (2, 40))/100 #1% amplitude additive noise
 
 #parameters
 a = 0.4
@@ -45,7 +45,7 @@ uarr_updates = []
 varr_updates = []
 for i in range(50000):
     ut, vt = pde(1, uv) #t = 1 because it doesnt play a role in computing the pdes
-    #updating with eulers method
+    #updating with explicit eulers method
     uarr_updates.append(uv[0])
     uv[0] = uv[0] + ut * dt
 
