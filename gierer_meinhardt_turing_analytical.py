@@ -7,7 +7,7 @@ from numpy import linalg
 
 def is_turing_instability(a: np.array, b:float, d:np.array):
     """
-    A function that returns True if we have the necessary Turing instability conditions based on parameters a, b, d in the Gierer Meinhardt model, and False otherwise.
+    A function that checks if we have the necessary Turing instability conditions based on parameters a, b, d in the Gierer Meinhardt model.
 
     Parameters:
         a: np.array
@@ -53,6 +53,9 @@ mask_turing = is_turing_instability(mesh_a, b, mesh_d)
 
 
 def plot_turing_space():
+    """
+    Plots the Turing space based on previously defined parameters.
+    """
     fig, ax = plt.subplots(1, 1)
     plt.xlabel("a")
     plt.ylabel("d")
@@ -68,6 +71,20 @@ def plot_turing_space():
 plot_turing_space()
 
 def find_leading_spatial_modes(a:float, b:float, d:float, length:float, number_of_modes:int):
+    """
+    Finds the leading spatial modes from mode 0 to mode N based on given parameters.
+    Parameters:
+        a: float
+        b: float
+        d: float
+            Parameters in the Gierer-Meinhardt model
+        length: float
+            length of the 1D region we are observing
+        number_of_modes: int
+            The number of modes we are going to analyze for stability/instability
+    Returns:
+        A list with the leading spatial modes n.
+    """
     #partial derivatives (computed by hand) evaluated at the fixed points (when f and g equal 0)
     fu = 2 * b / (a + 1) - b
     fv = -((b / (a + 1)) ** 2)
