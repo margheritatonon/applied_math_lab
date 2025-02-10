@@ -12,10 +12,21 @@ d2 = d
 gam = 1
 b = 1
 
-def spatial_part(N:int = 40, dx:float = 1):
+def create_array(N:int):
+    """
+    Returns an initial condition 2D array with noise of length N.
+    """
+    uv = np.ones((2, N)) #homogeneous stationary solution 
+    uv = uv + np.random.uniform(0, 1, (2, N))/100 #1% amplitude additive noise
+    return uv
+
+uv = create_array(40)
+
+def spatial_part(uv:np.array, N:int = 40, dx:float = 1):
     """
     Implements a 1D finite difference numerical approximation to integrate the spatial part of the reaction-diffusion equations.
     Parameters:
+        uv: the array of initial conditions
         N: the number of spatial points in the discretization
         dx: the spatial step
     Returns:
@@ -23,8 +34,6 @@ def spatial_part(N:int = 40, dx:float = 1):
         uv: the initial homogeneous stationary solution with 1% amplitude additive noise
         ut and vt: the PDEs
     """
-    uv = np.ones((2,N)) #homogeneous stationary solution 
-    uv = uv + np.random.uniform(0, 1, (2, 40))/100 #1% amplitude additive noise
     u, v = uv
 
     #computing laplacians - we are applying the 1D finite difference numerical scheme
@@ -43,12 +52,12 @@ def spatial_part(N:int = 40, dx:float = 1):
     ut = d1 * lap_u + gam * f
     vt = d2 * lap_v + gam * g
 
-    return (uv, ut, vt)
+    return (ut, vt)
 
 #integrating the system numerically
 #uv are the initial conditions
 
-uv, ut, vt = spatial_part()
+ut, vt = spatial_part(uv)
 print(f"uv.shape = {uv.shape}")
 print(f"uv[0].shape = {uv[0].shape}")
 print(f"ut.shape = {ut.shape}")
@@ -64,8 +73,8 @@ def eulers_method_pde(dt:float=0.01):
     """
     uarr_updates = []
     varr_updates = []
-    for i in range(50000):
-        uv, ut, vt = spatial_part() 
+    for i in range(50000): 
+        ut, vt = spatial_part(uv)
         #updating with explicit eulers method
         if i % 500 == 0: #appending every 500 iterations
             uarr_updates.append(uv[0])
