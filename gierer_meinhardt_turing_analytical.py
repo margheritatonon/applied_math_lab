@@ -89,7 +89,7 @@ def find_leading_spatial_modes(a:float, b:float, d:float, length:float, number_o
         max_real_temp_eigvals.append(max_eigval)
     
     sorted = np.argsort(max_real_temp_eigvals)[::-1] #from biggest to smallest
-    #print(max_real_temp_eigvals)
+    #print((np.array(max_real_temp_eigvals) > 0).sum())
     unstable_modes_indices = sorted[np.array(max_real_temp_eigvals)[sorted] > 0] 
     return unstable_modes_indices
 
