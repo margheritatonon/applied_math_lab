@@ -15,6 +15,8 @@ b = 1
 def create_array(N:int):
     """
     Returns an initial condition 2D array with noise of length N.
+    Parameters:
+        N: the number of spatial points in the discretization
     """
     uv = np.ones((2, N)) #homogeneous stationary solution 
     uv = uv + np.random.uniform(0, 1, (2, N))/100 #1% amplitude additive noise
@@ -22,20 +24,16 @@ def create_array(N:int):
 
 uv = create_array(40)
 
-def spatial_part(uv:np.array, N:int = 40, dx:float = 1):
+def spatial_part(uv:np.array, dx:float = 1):
     """
     Implements a 1D finite difference numerical approximation to integrate the spatial part of the reaction-diffusion equations.
     Parameters:
-        uv: the array of initial conditions
-        N: the number of spatial points in the discretization
+        uv: a 2D array of initial conditions for u and v
         dx: the spatial step
     Returns:
-        A tuple (uv, ut, vt)
-        uv: the initial homogeneous stationary solution with 1% amplitude additive noise
-        ut and vt: the PDEs
+        A tuple (ut, vt) of the PDEs
     """
     u, v = uv
-
     #computing laplacians - we are applying the 1D finite difference numerical scheme
     u_plus = np.roll(u, shift = dx)
     u_min = np.roll(u, shift = -dx)
@@ -77,11 +75,11 @@ def eulers_method_pde(dt:float=0.01):
         ut, vt = spatial_part(uv)
         #updating with explicit eulers method
         if i % 500 == 0: #appending every 500 iterations
-            uarr_updates.append(uv[0])
+            uarr_updates.append(np.copy(uv[0]))
         uv[0] = uv[0] + ut * dt
 
         if i % 500 == 0:
-            varr_updates.append(uv[1])
+            varr_updates.append(np.copy(uv[1]))
         uv[1] = uv[1] + vt * dt
 
         #boundary conditions:
@@ -112,3 +110,22 @@ def plot_static():
     plt.show()
 
 plot_static()
+
+print(varr_updates[0])
+print(varr_updates[1])
+print(varr_updates[2])
+print(varr_updates[0] == varr_updates[10])
+
+#now we want to animate the 100 frames we have instead of statically plotting the last frame.
+fig, ax = plt.subplots(1, 1)
+x_arr = np.linspace(0, 40, 40) 
+(plot_v,) = ax.plot(x_arr, varr_updates[0]) 
+
+def update(frame):
+    plot_v.set_ydata(varr_updates[frame])  
+    return plot_v,
+
+ani = animation.FuncAnimation(fig, update, frames=len(varr_updates), interval=1, blit=False)
+plt.xlabel("x")
+plt.ylabel("v")
+#plt.show()
