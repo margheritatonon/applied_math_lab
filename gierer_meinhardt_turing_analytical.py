@@ -57,9 +57,11 @@ def plot_turing_space():
     Plots the Turing space based on previously defined parameters.
     """
     fig, ax = plt.subplots(1, 1)
-    plt.xlabel("a")
-    plt.ylabel("d")
-    plt.title(f"Turing Space for b = {b}")
+    plt.xlabel("a", fontsize=19)
+    plt.ylabel("d", fontsize=20)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.title(f"Turing Space for b = {b}", fontsize=25)
     cmap_red_green = ListedColormap(["#69dd5d", "#dd5d5d"])
     plt.contourf(mesh_a, mesh_d, mask_turing, cmap = cmap_red_green)
     #adding a legend based on the colors
