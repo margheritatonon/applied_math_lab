@@ -190,4 +190,3 @@ def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:fl
 
 print(find_leading_spatial_modes(10, d = d))
 
-
