@@ -9,7 +9,7 @@ gamma = 1
 b = 1
 length_x = 20
 length_y = 50
-d = 20
+d = 30
 
 uv = np.ones((2, 20, 50)) #homogeneous stationary solution 
 uv += uv * np.random.randn(2, length_x, length_y) / 100
@@ -101,18 +101,50 @@ def animate_plot():
 
     def update(frame):
         im.set_array(varr_updates[frame])
-        im.set_clim(vmin=np.min(varr_updates[frame]), vmax=np.max(varr_updates[frame]))
+        im.set_clim(vmin=np.min(varr_updates[frame]), vmax=np.max(varr_updates[frame]) + 0.1)
         return (im, )
     
-    #im.set_clim(vmin=uv[1].min(), vmax=uv[1].max() + 0.1)
 
     ani = animation.FuncAnimation(
-    	fig, update, interval=1, blit=False, frames = len(varr_updates), repeat = False
+    	fig, update, interval=100, blit=True, frames = len(varr_updates), repeat = False
 	)
 
     plt.show()
 
-animate_plot()
+#animate_plot()
+
+print(len(varr_updates))
+print(f"varr_updates[0] = {varr_updates[0]}")
+print(f"varr_updates[-1] = {varr_updates[-1]}")
+
+def plot_static():
+    """
+    Creates a static plot of the last frame of animation of x versus v. 
+    """
+    #static plot:
+    fig, ax = plt.subplots(1, 1)
+    im = ax.imshow(
+    	varr_updates[0],
+    	interpolation="bilinear",
+    	#vmin=0,
+    	#vmax=10,
+    	origin="lower",
+    	extent=[0, length_y, 0, length_x],
+	)
+    im.set_array(varr_updates[-2])
+
+    vmin = np.percentile(varr_updates[-2], 5)  # 5th percentile
+    vmax = np.percentile(varr_updates[-2], 95) # 95th percentile
+    im.set_clim(vmin=vmin, vmax=vmax)
+    plt.xlabel("x")
+    plt.ylabel("v(x)")
+    plt.title(f"")
+    
+
+    plt.show()
+
+plot_static()
+
 
 
 def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:float=30):
