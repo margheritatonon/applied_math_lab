@@ -101,7 +101,7 @@ def animate_plot():
 
     def update(frame):
         im.set_array(varr_updates[frame])
-        im.set_clim(vmin=np.min(varr_updates[frame]), vmax=np.max(varr_updates[frame]) + 0.1)
+        im.set_clim(vmin=np.min(varr_updates[frame]), vmax=np.max(varr_updates[frame]) + 0.01)
         return (im, )
     
 
@@ -111,7 +111,7 @@ def animate_plot():
 
     plt.show()
 
-#animate_plot()
+animate_plot()
 
 print(len(varr_updates))
 print(f"varr_updates[0] = {varr_updates[0]}")
@@ -133,12 +133,10 @@ def plot_static():
 	)
     im.set_array(varr_updates[-2])
 
-    vmin = np.percentile(varr_updates[-2], 5) #for the color scale
-    vmax = np.percentile(varr_updates[-2], 95) 
-    im.set_clim(vmin=vmin, vmax=vmax)
-    plt.xlabel("x")
-    plt.ylabel("v(x)")
-    plt.title(f"")
+    im.set_clim(vmin=np.min(varr_updates[-1]), vmax=np.max(varr_updates[-1]) + 0.01)
+    plt.xlabel("x", fontsize = 20)
+    plt.ylabel("y", fontsize = 20)
+    plt.title(f"2D Gierer Meinhardt Model for d = {d}", fontsize=19)
     
 
     plt.show()
