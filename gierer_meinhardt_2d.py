@@ -41,7 +41,27 @@ def gierer_meinhardt_2d(t, uv, a=0.4, d = 20):
 
     return (ut, vt)
 
+num_iters = 50000
+dt = 0.01
 
+uarr_updates = []
+varr_updates = []
+for i in range(50000): 
+    ut, vt = spatial_part(uv)
+    #updating with explicit eulers method
+    if i % 500 == 0: #appending every 500 iterations
+        uarr_updates.append(np.copy(uv[0]))
+        uv[0] = uv[0] + ut * dt
+
+    if i % 500 == 0:
+        varr_updates.append(np.copy(uv[1]))
+        uv[1] = uv[1] + vt * dt
+
+        #boundary conditions:
+        uv[:, 0] = uv[:, 1]
+        uv[:, -1] = uv[:, -2]
+    
+    return (uarr_updates, varr_updates)
 
 
 

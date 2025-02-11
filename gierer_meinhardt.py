@@ -129,7 +129,7 @@ def animate_plot():
         plot_v.set_ydata(varr_updates[frame])  
         return plot_v,
 
-    ani = animation.FuncAnimation(fig, update, frames=len(varr_updates), interval=150, blit=True)
+    ani = animation.FuncAnimation(fig, update, frames=len(varr_updates), interval=100, blit=True)
     plt.xlabel("x")
     plt.ylabel("v")
     ax.set_xlim((0, 40))
