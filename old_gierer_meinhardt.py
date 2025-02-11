@@ -79,10 +79,11 @@ def plot_static():
     print(f"varr_updates[-1] = {varr_updates[-1].shape}")
     fig, ax = plt.subplots(1, 1)
     plt.plot(x_arr, varr_updates[-1])
+    plt.title(f"Final Animation Frame for d = {d}", fontsize = 20)
     ax.set_xlim((0, 40))
     ax.set_ylim((0, 5))
-    plt.xlabel("x")
-    plt.ylabel("v(x)")
+    plt.xlabel("x", fontsize = 20)
+    plt.ylabel("v(x)", fontsize = 20)
     plt.show()
 
 plot_static()
