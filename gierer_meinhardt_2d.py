@@ -101,7 +101,7 @@ def animate_plot():
 
     plt.show()
 
-animate_plot()
+#animate_plot()
 
 
 def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:float=30):
@@ -112,8 +112,6 @@ def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:fl
         b: float
         d: float
             Parameters in the Gierer-Meinhardt model
-        length: float
-            length of the 1D region we are observing
         number_of_modes: int
             The number of modes we are going to analyze for stability/instability
     Returns:
@@ -127,26 +125,26 @@ def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:fl
 
     jacobian = np.array([[fu, fv], [gu, gv]])
 
+    n_values = np.arange(1, number_of_modes)
     max_eigs = np.zeros((number_of_modes, number_of_modes))
-    for x in range(number_of_modes):
-        for y in range(number_of_modes):
-            lambda_x = (x * np.pi / length_x) ** 2
+    for x in n_values:
+        for y in n_values:
+            lambda_x = (x * np.pi / length_x) ** 2 #neumman boundary conditions
             lambda_y = (y * np.pi / length_y) ** 2
-
             D_matrix = np.diag([1, d])
             A_n = jacobian - (lambda_x + lambda_y) * D_matrix
 
             eig1, eig2 = np.linalg.eigvals(A_n)
-            max_eigs[x, y] = max(eig1.real, eig2.real)
+            eig1, eig2 = eig1.real, eig2.real
+            max_eigs[x, y] = max(eig1, eig2)
 
-    idx, idy = np.unravel_index(np.argsort(max_eigs, axis=None), max_eigs.shape)
-    num_positives = (max_eigs > 0).sum()
-    idx = idx[-1:-num_positives:-1]
-    idy = idy[-1:-num_positives:-1]
+    positives = max_eigs > 0
+    positive_indices = np.argwhere(positives)
+    pos_vals = max_eigs[positives]
+    sorted_indices =  np.argsort(-pos_vals)
+    leading_modes = positive_indices[sorted_indices]
+    return leading_modes
 
-    unstable_modes = [(i, j) for i, j in zip(idx, idy)]
-    return unstable_modes
-
-print(find_leading_spatial_modes(2, d = 20))
+print(find_leading_spatial_modes(10, d = 30))
 
 
