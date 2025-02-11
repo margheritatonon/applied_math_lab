@@ -133,8 +133,8 @@ def plot_static():
 	)
     im.set_array(varr_updates[-2])
 
-    vmin = np.percentile(varr_updates[-2], 5)  # 5th percentile
-    vmax = np.percentile(varr_updates[-2], 95) # 95th percentile
+    vmin = np.percentile(varr_updates[-2], 5) #for the color scale
+    vmax = np.percentile(varr_updates[-2], 95) 
     im.set_clim(vmin=vmin, vmax=vmax)
     plt.xlabel("x")
     plt.ylabel("v(x)")
