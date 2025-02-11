@@ -60,20 +60,27 @@ print(ut.shape)
 uarr_updates = []
 varr_updates = []
 for i in range(50000): 
-    ut, vt = (gierer_meinhardt_2d(uv, d = d))
+    ut, vt = gierer_meinhardt_2d(uv, d = d)
     uv[0] = uv[0] + ut * dt
     uv[1] = uv[1] + vt * dt
     #updating with explicit eulers method
-
-    if i % 500 == 0: #appending every 500 iterations
-        uarr_updates.append(np.copy(uv[0]))
-        varr_updates.append(np.copy(uv[1]))
 
     #Neumann boundary conditions:
     uv[:, 0, :] = uv[:, 1, :]
     uv[:, -1, :] = uv[:, -2, :]
     uv[:, :, 0] = uv[:, :, 1]
     uv[:, :, -1] = uv[:, :, -2]
+
+    #periodic boundary conditions:
+    #uv[:, 0, :] = uv[:, -2, :] 
+    #uv[:, -1, :] = uv[:, 1, :]  
+    #uv[:, :, 0] = uv[:, :, -2]  
+    #uv[:, :, -1] = uv[:, :, 1]  
+
+
+    if i % 500 == 0: #appending every 500 iterations
+        uarr_updates.append(np.copy(uv[0]))
+        varr_updates.append(np.copy(uv[1]))
 
 print(len(varr_updates))
 
@@ -100,7 +107,7 @@ def animate_plot():
     #im.set_clim(vmin=uv[1].min(), vmax=uv[1].max() + 0.1)
 
     ani = animation.FuncAnimation(
-    	fig, update, interval=100, blit=False, frames = len(varr_updates), repeat = False
+    	fig, update, interval=1, blit=False, frames = len(varr_updates), repeat = False
 	)
 
     plt.show()
