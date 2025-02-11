@@ -47,7 +47,7 @@ def gierer_meinhardt_2d(uv, a=0.4, d = 30):
     return (ut, vt)
 
 num_iters = 50000
-dt = 0.01
+dt = 0.001
 
 ut, vt = gierer_meinhardt_2d(uv)
 print(uv[0].shape)
@@ -56,21 +56,22 @@ print(ut.shape)
 uarr_updates = []
 varr_updates = []
 for i in range(50000): 
-    ut, vt = gierer_meinhardt_2d(uv, d = 30)
+    ut, vt = (gierer_meinhardt_2d(uv))
+    uv[0] = uv[0] + ut * dt
+    uv[1] = uv[1] + vt * dt
     #updating with explicit eulers method
+
     if i % 500 == 0: #appending every 500 iterations
         uarr_updates.append(np.copy(uv[0]))
-        uv[0] = uv[0] + ut * dt
-
-    if i % 500 == 0:
         varr_updates.append(np.copy(uv[1]))
-        uv[1] = uv[1] + vt * dt
 
-        #Neumann boundary conditions:
-        uv[:, 0, :] = uv[:, 1, :]
-        uv[:, -1, :] = uv[:, -2, :]
-        uv[:, :, 0] = uv[:, :, 1]
-        uv[:, :, -1] = uv[:, :, -2]
+    #Neumann boundary conditions:
+    uv[:, 0, :] = uv[:, 1, :]
+    uv[:, -1, :] = uv[:, -2, :]
+    uv[:, :, 0] = uv[:, :, 1]
+    uv[:, :, -1] = uv[:, :, -2]
+
+print(uarr_updates)
 
 
 def animate_plot():
@@ -89,16 +90,18 @@ def animate_plot():
 
     def update(frame):
         im.set_array(varr_updates[frame])
+        im.set_clim(vmin=np.min(varr_updates[frame]), vmax=np.max(varr_updates[frame]))
         return (im, )
     
     #im.set_clim(vmin=uv[1].min(), vmax=uv[1].max() + 0.1)
 
     ani = animation.FuncAnimation(
-    	fig, update, interval=100, blit=True,
+    	fig, update, frames = len(varr_updates), interval=150, blit=True,
 	)
+
     plt.show()
 
-#animate_plot()
+animate_plot()
 
 
 def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:float=30):
