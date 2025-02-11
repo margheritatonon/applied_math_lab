@@ -15,6 +15,9 @@ uv = np.ones((2, 20, 50)) #homogeneous stationary solution
 uv += uv * np.random.randn(2, length_x, length_y) / 100
 
 def gierer_meinhardt_2d(uv, d, a=0.4):
+    """
+    Sets up the Gierer_Meinhardt 2D model for array uv and parameters d, a, returning dudt and dvdt.
+    """
     u, v = uv
     #moving up
     u_up = np.roll(u, shift=1, axis=0)
