@@ -9,11 +9,12 @@ gamma = 1
 b = 1
 length_x = 20
 length_y = 50
+d = 20
 
 uv = np.ones((2, 20, 50)) #homogeneous stationary solution 
-uv = uv + np.random.uniform(0, 1, uv.shape)/100
+uv += uv * np.random.randn(2, length_x, length_y) / 100
 
-def gierer_meinhardt_2d(uv, a=0.4, d = 30):
+def gierer_meinhardt_2d(uv, d, a=0.4):
     u, v = uv
     #moving up
     u_up = np.roll(u, shift=1, axis=0)
@@ -49,14 +50,14 @@ def gierer_meinhardt_2d(uv, a=0.4, d = 30):
 num_iters = 50000
 dt = 0.001
 
-ut, vt = gierer_meinhardt_2d(uv)
+ut, vt = gierer_meinhardt_2d(uv, d = d)
 print(uv[0].shape)
 print(ut.shape)
 
 uarr_updates = []
 varr_updates = []
 for i in range(50000): 
-    ut, vt = (gierer_meinhardt_2d(uv))
+    ut, vt = (gierer_meinhardt_2d(uv, d = d))
     uv[0] = uv[0] + ut * dt
     uv[1] = uv[1] + vt * dt
     #updating with explicit eulers method
@@ -71,7 +72,7 @@ for i in range(50000):
     uv[:, :, 0] = uv[:, :, 1]
     uv[:, :, -1] = uv[:, :, -2]
 
-print(uarr_updates)
+print(len(varr_updates))
 
 
 def animate_plot():
@@ -96,12 +97,12 @@ def animate_plot():
     #im.set_clim(vmin=uv[1].min(), vmax=uv[1].max() + 0.1)
 
     ani = animation.FuncAnimation(
-    	fig, update, frames = len(varr_updates), interval=150, blit=True,
+    	fig, update, interval=100, blit=False, frames = len(varr_updates), repeat = False
 	)
 
     plt.show()
 
-#animate_plot()
+animate_plot()
 
 
 def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:float=30):
@@ -144,9 +145,9 @@ def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:fl
     sorted_indices =  np.argsort(-pos_vals)
     leading_modes = positive_indices[sorted_indices]
     leading_eigenvalues = pos_vals[sorted_indices]
-    print(leading_eigenvalues) #just to check that they are all indeed positiv
+    print(leading_eigenvalues) #just to check that they are all indeed positive
     return (leading_modes)
 
-print(find_leading_spatial_modes(10, d = 30))
+print(find_leading_spatial_modes(10, d = d))
 
 
