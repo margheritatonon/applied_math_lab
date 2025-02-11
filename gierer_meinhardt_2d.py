@@ -143,7 +143,9 @@ def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:fl
     pos_vals = max_eigs[positives]
     sorted_indices =  np.argsort(-pos_vals)
     leading_modes = positive_indices[sorted_indices]
-    return leading_modes
+    leading_eigenvalues = pos_vals[sorted_indices]
+    print(leading_eigenvalues) #just to check that they are all indeed positiv
+    return (leading_modes)
 
 print(find_leading_spatial_modes(10, d = 30))
 
