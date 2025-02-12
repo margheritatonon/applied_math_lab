@@ -114,18 +114,24 @@ def find_leading_spatial_modes(a:float, b:float, d:float, length:float, number_o
 
 #question 3 from assignment
 ex1 = find_leading_spatial_modes(0.4, 1, 30, 40, 10)
-print(f"Leading spatial modes for d = 30 are: {ex1}")
-print(f"Turing instability present: {is_turing_instability(0.4, 1, 30)}")
+#print(f"Leading spatial modes for d = 30 are: {ex1}")
+#print(f"Turing instability present: {is_turing_instability(0.4, 1, 30)}")
 #n=4 is the leading spatial mode: find Fn and Gn
 
 ex2 = find_leading_spatial_modes(0.4, 1, 20, 40, 10)
-print(f"Leading spatial modes for d = 20 are: {ex2}")
-print(f"Turing instability present: {is_turing_instability(0.4, 1, 20)}")
+#print(f"Leading spatial modes for d = 20 are: {ex2}")
+#print(f"Turing instability present: {is_turing_instability(0.4, 1, 20)}")
 
 a = 0.1
 ex2 = find_leading_spatial_modes(a, 1, 20, 40, 10)
-print(f"Leading spatial modes for a = {a} are: {ex2}")
-print(f"Turing instability present: {is_turing_instability(a, 1, 20)}") 
+#print(f"Leading spatial modes for a = {a} are: {ex2}")
+#print(f"Turing instability present: {is_turing_instability(a, 1, 20)}") 
+
+
+d = 40
+ex2 = find_leading_spatial_modes(0.4, 1, d, 40, 10)
+print(f"Leading spatial modes for d = {d} are: {ex2}")
+print(f"Turing instability present: {is_turing_instability(0.4, 1, d)}") 
 
 
 #if __name__ == "__main__":
