@@ -6,7 +6,7 @@ from matplotlib.backend_bases import MouseEvent
 
 #parameters
 a = 0.4
-d = 40
+d = 30
 d1 = 1
 d2 = d
 gam = 1
@@ -22,7 +22,8 @@ def create_array(N:int):
     uv = uv + np.random.uniform(0, 1, (2, N))/100 #1% amplitude additive noise
     return uv
 
-uv = create_array(40)
+region_length = 50
+uv = create_array(region_length)
 
 def spatial_part(uv:np.array, dx:float = 1):
     """
@@ -98,16 +99,16 @@ def plot_static():
     Creates a static plot of the last frame of animation of x versus v. 
     """
     #static plot:
-    x_arr = np.linspace(0, 40, 40)
+    x_arr = np.linspace(0, region_length, region_length)
     print(f"x_arr = {x_arr.shape}")
     print(f"varr_updates[-1] = {varr_updates[-1].shape}")
     fig, ax = plt.subplots(1, 1)
     plt.plot(x_arr, varr_updates[-1])
-    ax.set_xlim((0, 40))
+    ax.set_xlim((0, region_length))
     ax.set_ylim((0, 5))
     plt.xlabel("x", fontsize = 15)
     plt.ylabel("v(x)", fontsize = 15)
-    plt.title(f"Final Animation Frame for d = {d}", fontsize = 20)
+    plt.title(f"Final Animation Frame for L = {region_length}", fontsize = 20)
     plt.show()
 
 plot_static()
@@ -123,7 +124,7 @@ def animate_plot():
     Animates the plot of the numerically integrated solution.
     """
     fig, ax = plt.subplots(1, 1)
-    x_arr = np.linspace(0, 40, 40) 
+    x_arr = np.linspace(0, region_length, region_length) 
     (plot_v,) = ax.plot(x_arr, varr_updates[0]) 
 
     def update(frame):
@@ -133,7 +134,7 @@ def animate_plot():
     ani = animation.FuncAnimation(fig, update, frames=len(varr_updates), interval=100, blit=True)
     plt.xlabel("x")
     plt.ylabel("v")
-    ax.set_xlim((0, 40))
+    ax.set_xlim((0, region_length))
     ax.set_ylim((0, 4))
     plt.show()
 
