@@ -6,7 +6,7 @@ from matplotlib.backend_bases import MouseEvent
 
 #parameters
 a = 0.4
-d = 20
+d = 40
 d1 = 1
 d2 = d
 gam = 1
@@ -107,7 +107,7 @@ def plot_static():
     ax.set_ylim((0, 5))
     plt.xlabel("x", fontsize = 15)
     plt.ylabel("v(x)", fontsize = 15)
-    plt.title(f"Final Animation Frame for a = {a}", fontsize = 20)
+    plt.title(f"Final Animation Frame for d = {d}", fontsize = 20)
     plt.show()
 
 plot_static()
