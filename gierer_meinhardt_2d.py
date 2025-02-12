@@ -10,11 +10,12 @@ b = 1
 length_x = 20
 length_y = 50
 d = 20
+a = 0.4
 
 uv = np.ones((2, 20, 50)) #homogeneous stationary solution 
 uv += uv * np.random.randn(2, length_x, length_y) / 100
 
-def gierer_meinhardt_2d(uv, d, a=0.4):
+def gierer_meinhardt_2d(uv):
     """
     Sets up the Gierer_Meinhardt 2D model for array uv and parameters d, a, returning dudt and dvdt.
     """
@@ -53,14 +54,14 @@ def gierer_meinhardt_2d(uv, d, a=0.4):
 num_iters = 50000
 dt = 0.001
 
-ut, vt = gierer_meinhardt_2d(uv, d = d)
+ut, vt = gierer_meinhardt_2d(uv)
 print(uv[0].shape)
 print(ut.shape)
 
 uarr_updates = []
 varr_updates = []
 for i in range(50000): 
-    ut, vt = gierer_meinhardt_2d(uv, d = d)
+    ut, vt = gierer_meinhardt_2d(uv)
     uv[0] = uv[0] + ut * dt
     uv[1] = uv[1] + vt * dt
     #updating with explicit eulers method
@@ -111,7 +112,7 @@ def animate_plot():
     plt.title(f"2D Gierer Meinhardt Model for d = {d}", fontsize=19)
     plt.show()
 
-animate_plot()
+#animate_plot()
 
 print(len(varr_updates))
 print(f"varr_updates[0] = {varr_updates[0]}")
@@ -145,7 +146,7 @@ plot_static()
 
 
 
-def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:float=30):
+def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:float=30, gamma:float = 1):
     """
     Finds the leading spatial modes for 2D Gierer Meinhardt from mode 0 to mode N based on given parameters.
     Parameters:
@@ -164,7 +165,7 @@ def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:fl
     gu = 2 * (a + 1) / b
     gv = -1.0
 
-    jacobian = np.array([[fu, fv], [gu, gv]])
+    jacobian = np.array([[fu, fv], [gu, gv]]) * gamma
 
     n_values = np.arange(1, number_of_modes)
     max_eigs = np.zeros((number_of_modes, number_of_modes))
@@ -188,5 +189,5 @@ def find_leading_spatial_modes(number_of_modes:int, a:float=0.4, b:float=1, d:fl
     print(leading_eigenvalues) #just to check that they are all indeed positive
     return (leading_modes)
 
-print(find_leading_spatial_modes(10, d = d))
+print(find_leading_spatial_modes(10, d = d, a = a))
 
