@@ -6,6 +6,7 @@ d1 = 0.1
 d2 = 0.05
 F =  0.040
 k = 0.060
+dx = 1
 
 #discretization with N = 250, dx = 1
 #we start with the homogeneous and stationary solution (u, v) = (1, 0)
@@ -14,6 +15,7 @@ uv[0, :, :] = 1 #because u = 1
 
 #we perturb this by changing the values on a (20, 20) square where (u, v) = (0.5, 0.5) 
 #plus an additive noise of 0.1 that value
+np.random.seed(13) #for reproducibility
 u_new = 0.5 * (1 + 0.1 * np.random.randn())
 v_new = 0.5 * (1 + 0.1 * np.random.randn())
 zero_start = np.random.randint(0, 230) #we do this so we have an index where to start and place the 20x20 square on
@@ -23,7 +25,7 @@ uv[0, zero_start:zero_start+20, one_start:one_start+20] = u_new
 uv[1, zero_start:zero_start+20, one_start:one_start+20] = v_new
 #print(uv[0, zero_start-2:zero_start+2, one_start-2:one_start+2])
 
-def gray_scott_2d(uv, dx:float = 1):
+def gray_scott_2d(uv, dx:float = dx):
     """
     Sets up the Gray-Scott 2D model for array uv, returning dudt and dvdt.
     """
@@ -93,7 +95,7 @@ def animate_plot():
 	)
     plt.show()
 
-#animate_plot()
+animate_plot()
 
 
 def plot_static():
@@ -115,6 +117,7 @@ def plot_static():
     im.set_clim(vmin=np.min(varr_updates[-1]), vmax=np.max(varr_updates[-1]) + 0.01)
     plt.xlabel("x", fontsize = 20)
     plt.ylabel("y", fontsize = 20)
+    #plt.title(f"Gray-Scott Model for dx = {dx}, dt = {dt}", fontsize = 18)
     
 
     plt.show()
