@@ -128,7 +128,7 @@ ex2 = find_leading_spatial_modes(a, 1, 20, 40, 10)
 #print(f"Turing instability present: {is_turing_instability(a, 1, 20)}") 
 
 
-d = 40
+d = 60
 ex2 = find_leading_spatial_modes(0.4, 1, d, 40, 10)
 print(f"Leading spatial modes for d = {d} are: {ex2}")
 print(f"Turing instability present: {is_turing_instability(0.4, 1, d)}") 
