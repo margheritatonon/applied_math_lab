@@ -7,6 +7,7 @@ d2 = 0.05
 F =  0.040
 k = 0.060
 dx = 1
+dt = 0.05
 
 #discretization with N = 250, dx = 1
 #we start with the homogeneous and stationary solution (u, v) = (1, 0)
@@ -54,11 +55,10 @@ def gray_scott_2d(uv, dx:float = dx):
     return (ut, vt)
 
 num_iters = 50000
-dt = 2
 
 uarr_updates = []
 varr_updates = []
-for i in range(50000): 
+for i in range(num_iters): 
     #updating with explicit eulers method
     ut, vt = gray_scott_2d(uv)
     uv[0] = uv[0] + ut * dt
@@ -117,9 +117,9 @@ def plot_static():
     im.set_clim(vmin=np.min(varr_updates[-1]), vmax=np.max(varr_updates[-1]) + 0.01)
     plt.xlabel("x", fontsize = 20)
     plt.ylabel("y", fontsize = 20)
-    #plt.title(f"Gray-Scott Model for dx = {dx}, dt = {dt}", fontsize = 18)
+    plt.title(f"Gray-Scott Model for dx = {dx}, dt = {dt}", fontsize = 18)
     
 
     plt.show()
 
-plot_static()
+#plot_static()
