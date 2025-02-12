@@ -9,7 +9,7 @@ gamma = 1
 b = 1
 length_x = 20
 length_y = 50
-d = 30
+d = 20
 
 uv = np.ones((2, 20, 50)) #homogeneous stationary solution 
 uv += uv * np.random.randn(2, length_x, length_y) / 100
@@ -108,7 +108,7 @@ def animate_plot():
     ani = animation.FuncAnimation(
     	fig, update, interval=100, blit=True, frames = len(varr_updates), repeat = False
 	)
-
+    plt.title(f"2D Gierer Meinhardt Model for d = {d}", fontsize=19)
     plt.show()
 
 animate_plot()
