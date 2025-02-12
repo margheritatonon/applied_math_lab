@@ -70,7 +70,7 @@ def plot_turing_space():
     plt.legend(handles=[stable_patch, unstable_patch], loc="upper right")
     plt.show()
 
-plot_turing_space()
+#plot_turing_space()
 
 def find_leading_spatial_modes(a:float, b:float, d:float, length:float, number_of_modes:int):
     """
@@ -121,7 +121,11 @@ print(f"Turing instability present: {is_turing_instability(0.4, 1, 30)}")
 ex2 = find_leading_spatial_modes(0.4, 1, 20, 40, 10)
 print(f"Leading spatial modes for d = 20 are: {ex2}")
 print(f"Turing instability present: {is_turing_instability(0.4, 1, 20)}")
-    
+
+a = 0.1
+ex2 = find_leading_spatial_modes(a, 1, 20, 40, 10)
+print(f"Leading spatial modes for a = {a} are: {ex2}")
+print(f"Turing instability present: {is_turing_instability(a, 1, 20)}") 
 
 
 #if __name__ == "__main__":
