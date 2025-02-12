@@ -22,7 +22,7 @@ def create_array(N:int):
     uv = uv + np.random.uniform(0, 1, (2, N))/100 #1% amplitude additive noise
     return uv
 
-region_length = 50
+region_length = 40
 uv = create_array(region_length)
 
 def spatial_part(uv:np.array, dx:float = 1):
@@ -108,7 +108,7 @@ def plot_static():
     ax.set_ylim((0, 5))
     plt.xlabel("x", fontsize = 15)
     plt.ylabel("v(x)", fontsize = 15)
-    plt.title(f"Final Animation Frame for L = {region_length}", fontsize = 20)
+    plt.title(f"Final Animation Frame for γ = {gam}", fontsize = 20)
     plt.show()
 
 plot_static()
@@ -138,4 +138,4 @@ def animate_plot():
     ax.set_ylim((0, 4))
     plt.show()
 
-animate_plot()
+#animate_plot()
