@@ -72,7 +72,7 @@ def plot_turing_space():
 
 #plot_turing_space()
 
-def find_leading_spatial_modes(a:float, b:float, d:float, length:float, number_of_modes:int):
+def find_leading_spatial_modes(a:float, b:float, d:float, length:float, number_of_modes:int, gamma:float = 1):
     """
     Finds the leading spatial modes from mode 0 to mode N based on given parameters.
     Parameters:
@@ -84,6 +84,8 @@ def find_leading_spatial_modes(a:float, b:float, d:float, length:float, number_o
             length of the 1D region we are observing
         number_of_modes: int
             The number of modes we are going to analyze for stability/instability
+        gamma: float
+            Parameter in the Gierer-Meinhardt model
     Returns:
         A list with the leading spatial modes n.
     """
@@ -93,7 +95,7 @@ def find_leading_spatial_modes(a:float, b:float, d:float, length:float, number_o
     gu = 2 * (a + 1) / b
     gv = -1.0
 
-    jacobian = np.array([[fu, fv], [gu, gv]])
+    jacobian = np.array([[fu, fv], [gu, gv]]) * gamma
 
     range = np.arange(0, number_of_modes)
     max_real_temp_eigvals = []
@@ -134,8 +136,13 @@ ex2 = find_leading_spatial_modes(0.4, 1, d, 40, 10)
 #print(f"Turing instability present: {is_turing_instability(0.4, 1, d)}") 
 
 length = 15
-ex2 = find_leading_spatial_modes(0.4, 1, 30, length, 50)
-print(f"Leading spatial modes for L = {length} are: {ex2}")
+#ex2 = find_leading_spatial_modes(0.4, 1, 30, length, 50)
+#print(f"Leading spatial modes for L = {length} are: {ex2}")
+#print(f"Turing instability present: {is_turing_instability(0.4, 1, 30)}") 
+
+gamma = 4
+ex2 = find_leading_spatial_modes(0.4, 1, 30, 40, 50, gamma)
+print(f"Leading spatial modes for gamma = {gamma} are: {ex2}")
 print(f"Turing instability present: {is_turing_instability(0.4, 1, 30)}") 
 
 
