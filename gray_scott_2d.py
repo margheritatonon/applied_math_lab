@@ -23,7 +23,7 @@ uv[0, zero_start:zero_start+20, one_start:one_start+20] = u_new
 uv[1, zero_start:zero_start+20, one_start:one_start+20] = v_new
 #print(uv[0, zero_start-2:zero_start+2, one_start-2:one_start+2])
 
-def gray_scott_2d(uv):
+def gray_scott_2d(uv, dx:float = 1):
     """
     Sets up the Gray-Scott 2D model for array uv, returning dudt and dvdt.
     """
@@ -42,8 +42,8 @@ def gray_scott_2d(uv):
     v_right = np.roll(v, shift=-1, axis = 1)
 
     # 5 point stencil
-    lap_u_5 = u_up + u_down + u_left + u_right - 4*u 
-    lap_v_5 = v_up + v_down + v_left + v_right - 4*v
+    lap_u_5 = (u_up + u_down + u_left + u_right - 4*u) / dx**2
+    lap_v_5 = (v_up + v_down + v_left + v_right - 4*v) / dx**2
 
     #the pdes:
     ut = d1 * lap_u_5 - u*v*v + F*(1-u)
@@ -51,3 +51,72 @@ def gray_scott_2d(uv):
 
     return (ut, vt)
 
+num_iters = 50000
+dt = 2
+
+uarr_updates = []
+varr_updates = []
+for i in range(50000): 
+    #updating with explicit eulers method
+    ut, vt = gray_scott_2d(uv)
+    uv[0] = uv[0] + ut * dt
+    uv[1] = uv[1] + vt * dt
+
+    #periodic boundary conditions: because we use np.roll, these are already implemented before.
+
+    if i % 200 == 0: #appending every 200 iterations
+        uarr_updates.append(np.copy(uv[0]))
+        varr_updates.append(np.copy(uv[1]))
+
+def animate_plot():
+    """
+    Animates the plot of the numerically integrated solution.
+    """
+    fig, ax = plt.subplots(1, 1)
+    im = ax.imshow(
+    	varr_updates[0],
+    	interpolation="bilinear",
+    	#vmin=0,
+    	#vmax=10,
+    	origin="lower",
+    	extent=[0, 250, 0, 250],
+	)
+
+    def update(frame):
+        im.set_array(varr_updates[frame])
+        im.set_clim(vmin=np.min(varr_updates[frame]), vmax=np.max(varr_updates[frame]) + 0.01)
+        return (im, )
+    
+
+    ani = animation.FuncAnimation(
+    	fig, update, interval=100, blit=True, frames = len(varr_updates), repeat = False
+	)
+    plt.show()
+
+#animate_plot()
+
+
+def plot_static():
+    """
+    Creates a static plot of the last frame of animation of x versus v. 
+    """
+    #static plot:
+    fig, ax = plt.subplots(1, 1)
+    im = ax.imshow(
+    	varr_updates[0],
+    	interpolation="bilinear",
+    	#vmin=0,
+    	#vmax=10,
+    	origin="lower",
+    	extent=[0, 250, 0, 250],
+	)
+    im.set_array(varr_updates[-2])
+
+    im.set_clim(vmin=np.min(varr_updates[-1]), vmax=np.max(varr_updates[-1]) + 0.01)
+    plt.xlabel("x", fontsize = 20)
+    plt.ylabel("y", fontsize = 20)
+    
+
+    plt.show()
+
+plot_static()
