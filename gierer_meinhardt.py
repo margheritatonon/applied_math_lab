@@ -108,7 +108,8 @@ def plot_static():
     ax.set_ylim((0, 5))
     plt.xlabel("x", fontsize = 15)
     plt.ylabel("v(x)", fontsize = 15)
-    plt.title(f"Final Animation Frame for γ = {gam}", fontsize = 20)
+    #plt.title(f"Final Animation Frame for γ = {gam}", fontsize = 20)
+    plt.title(f"Final Animation Frame for d = {d}", fontsize = 20)
     plt.show()
 
 plot_static()
