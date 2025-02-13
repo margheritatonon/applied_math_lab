@@ -4,8 +4,8 @@ import matplotlib.animation as animation
 
 d1 = 0.1
 d2 = 0.05
-F =  0.078
-k = 0.061
+F =  0.040
+k = 0.060
 dx = 1
 dt = 2
 
