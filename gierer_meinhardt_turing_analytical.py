@@ -103,7 +103,7 @@ def find_leading_spatial_modes(a:float, b:float, d:float, length:float, number_o
         lambda_n = ((np.pi * (n+1)) / length) ** 2 #assuming dirichlet boundary conditions
         D_matrix = np.diag([1, d])
         A_n = jacobian - lambda_n * D_matrix
-        egival1, eigval2 = np.linalg.eigvals(A_n)
+        egival1, eigval2 = np.linalg.eigvals(A_n) #these are the temporal eigenvalues!
         real1 = egival1.real
         real2 = eigval2.real
         max_eigval = max(real1, real2)
@@ -111,7 +111,8 @@ def find_leading_spatial_modes(a:float, b:float, d:float, length:float, number_o
     
     sorted = np.argsort(max_real_temp_eigvals)[::-1] #from biggest to smallest
     #print((np.array(max_real_temp_eigvals) > 0).sum())
-    unstable_modes_indices = sorted[np.array(max_real_temp_eigvals)[sorted] > 0] 
+    print(np.array(max_real_temp_eigvals)[np.array(max_real_temp_eigvals) > 0]) #this print statement finds the positive temporal eigenvalues
+    unstable_modes_indices = sorted[np.array(max_real_temp_eigvals)[sorted] > 0]
     return unstable_modes_indices
 
 #question 3 from assignment
