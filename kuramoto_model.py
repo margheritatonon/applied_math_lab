@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 def initialize_oscillators(n:int, sigma:float = 1.0):
     #draw theta from uniform distribution
@@ -18,6 +19,20 @@ def mean_field_odes(t, thetas, omegas, K):
     thetas_dot = omegas - K*r*np.sin(thetas)
     return thetas_dot
 
+def pairwise_odes(t, thetas, omegas, K):
+    thetas = np.mod(thetas, 2*np.pi)
+    thetas_dot = []
+    for i in range(len(thetas)):
+        gamma_js = []
+        for j in range(len(thetas)):
+            if i == j:
+                next
+            else:
+                gamma_ij = (K / len(thetas)) * np.sin(thetas[j] - thetas[i])
+                gamma_js.append(gamma_ij)
+        thetai_dot = omegas[i] + np.sum(np.array(gamma_ij))
+        thetas_dot.append(thetai_dot)
+    return np.array(thetas_dot)
 
 
 #parameters:
@@ -46,4 +61,25 @@ ax_phase.add_artist(circle)
 scatter = ax_phase.scatter([], [], s=50, color="blue", alpha=0.5)
 
 def update(frame:int):
-    pass
+    global thetas
+
+    sol = solve_ivp(mean_field_odes, (0, dt), thetas, args=(omegas, K))
+    thetas = sol.y[..., -1]
+
+    thetas = np.mod(thetas, 2 * np.pi)
+
+    #update scatter plot on the unit circle
+    x = np.cos(thetas)
+    y = np.sin(thetas)
+    data = np.vstack((x, y)).T
+    scatter.set_offsets(data)
+	
+    return [scatter]
+
+ani = animation.FuncAnimation(fig, update, blit=True, interval=1)
+
+plt.tight_layout()
+plt.show()
+
+
+
