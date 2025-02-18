@@ -76,10 +76,61 @@ def update(frame:int):
 	
     return [scatter]
 
-ani = animation.FuncAnimation(fig, update, blit=True, interval=1)
+def animate_circle():
+    ani = animation.FuncAnimation(fig, update, blit=True, interval=1)
+    plt.tight_layout()
+    plt.show()
 
-plt.tight_layout()
+#animate_circle()
+
+
+
+#BIFURCATION DIAGRAM
+def prob_distribution(omega, sigma:float=sigma):
+    return (1 / np.sqrt(2*np.pi*(sigma**2))) * np.exp(-(omega**2) / (2 * sigma**2))
+
+g_zero = prob_distribution(0)
+
+k_critical = 2 / (np.pi * g_zero)
+
+#plotting theoretical values:
+ranges = np.linspace(0, 5, 100)
+to_plot = []
+for k in ranges:
+    if k < k_critical:
+        to_plot.append(0)
+    else:
+        to_plot.append(np.sqrt(1 - k_critical/k))
+arr_to_plot = np.array(to_plot)
+
+#empirical:
+def integrate_for_r(num_iters, K, dt:float = dt):
+    theta, omega = initialize_oscillators(1000, sigma)
+    thetas_dot = mean_field_odes(1, theta, omega, K)
+    rs = []
+    for i in range(num_iters):
+        theta = theta + dt * thetas_dot
+        r = np.abs((1/len(theta)) * np.sum(np.exp(theta * 1j)))
+        rs.append(r)
+    #print(len(rs[-11:-1]))
+    return np.sum(np.array(rs[-11:-1])) / 10
+
+avg_rs_for_k = []
+for k in ranges:
+    rs = integrate_for_r(1000, k)
+    avg_rs_for_k.append(rs)
+
+print(avg_rs_for_k)
+
+#print(integrate_for_r(1000, 0.5))
+#print(integrate_for_r(1000, 1))
+#print(integrate_for_r(1000, 2))
+#print(integrate_for_r(1000, 5))
+
+fig, ax_bifurcation = plt.subplots(1, 1, figsize=(12, 6))
+plt.plot(ranges, arr_to_plot, label = "Theoretical")
+plt.scatter(ranges, np.array(avg_rs_for_k), label = "Empirical", color = "red")
+plt.title("Bifurcation Diagram")
+plt.xlabel("Coupling Strength (K)")
+plt.ylabel("Order Parameter (r)")
 plt.show()
-
-
-
