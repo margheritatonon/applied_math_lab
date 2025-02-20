@@ -3,9 +3,14 @@ from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-def initialize_oscillators(n:int, sigma:float = 1.0):
+def initialize_oscillators(n:int, sigma:float = 1.0, concentration:str = "dispersed"):
     #draw theta from uniform distribution
-    thetas = np.random.uniform(0, 2*np.pi, n)
+    if concentration == "dispersed":
+        thetas = np.random.uniform(0, 2*np.pi, n)
+    elif concentration == "concentrated":
+        thetas = np.random.uniform(0, np.pi, n) #the initial phases will only span half of the circle
+    else:
+        raise ValueError("Invalid concentration value. You must input \"dispersed\" or \"concentrated\"")
     
     #draw omega from normal distribution
     omegas = np.random.normal(0, sigma, n)
@@ -36,13 +41,14 @@ def pairwise_odes(t, thetas, omegas, K):
 
 
 #parameters:
-K = 1
+K = 7
 n = 100
 sigma = 1
 dt = 0.01
+conc = "dispersed"
 
 #initializing oscillators
-thetas, omegas = initialize_oscillators(n, sigma)
+thetas, omegas = initialize_oscillators(n, sigma, concentration=conc)
 
 #plots:
 fig, ax_phase = plt.subplots(1, 1, figsize=(12, 6))
@@ -81,7 +87,7 @@ def animate_circle():
     plt.tight_layout()
     plt.show()
 
-#animate_circle()
+animate_circle()
 
 
 
@@ -110,7 +116,7 @@ def integrate_for_r(num_iters, K, dt:float = dt):
     rs = []
     for i in range(num_iters):
         theta = theta + dt * thetas_dot
-        r = np.abs((1/len(theta)) * np.sum(np.exp(theta * 1j)))
+        r = np.abs((1/len(theta)) * np.sum(np.exp(theta * 1j))) #the absolute value is the modulus
         rs.append(r)
     #print(len(rs[-11:-1]))
     return np.sum(np.array(rs[-11:-1])) / 10
@@ -133,4 +139,4 @@ plt.scatter(ranges, np.array(avg_rs_for_k), label = "Empirical", color = "red")
 plt.title("Bifurcation Diagram")
 plt.xlabel("Coupling Strength (K)")
 plt.ylabel("Order Parameter (r)")
-plt.show()
+#plt.show()
