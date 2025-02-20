@@ -83,6 +83,12 @@ def other_params(thetas):
 
 #we also want a graph of r with respect to time.
 ax_r_time.set_title("Order Parameter r Versus Time")
+ax_r_time.set_ylabel("r")
+ax_r_time.set_xlabel("Time")
+ax_r_time.set_ylim(0, 1)
+ls_order_param = [0] * 500
+ls_t = np.arange(0, 500) * dt
+(line_order_param,) = ax_r_time.plot(ls_t, ls_order_param, color="red")
 
 def update(frame:int):
     global thetas
@@ -102,8 +108,12 @@ def update(frame:int):
     r, phi, rcosphi, rsinphi = other_params(thetas)
     centroid_line.set_data([0, rcosphi], [0, rsinphi])
     centroid_point.set_data([rcosphi], [rsinphi])
+
+    ls_order_param.append(r)
+    ls_order_param.pop(0)
+    line_order_param.set_data(ls_t, ls_order_param)
 	
-    return [scatter, centroid_line, centroid_point]
+    return [scatter, centroid_line, centroid_point, line_order_param]
 
 def animate_circle():
     ani = animation.FuncAnimation(fig, update, blit=True, interval=1)
