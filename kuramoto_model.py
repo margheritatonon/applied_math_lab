@@ -51,7 +51,7 @@ conc = "dispersed"
 thetas, omegas = initialize_oscillators(n, sigma, concentration=conc)
 
 #plots:
-fig, ax_phase = plt.subplots(1, 1, figsize=(12, 6))
+fig, (ax_phase, ax_r_time,) = plt.subplots(1, 2, figsize=(12, 6))
 ax_phase.set_title("Kuramoto Model")
 ax_phase.set_xlabel("Cos(theta)")
 ax_phase.set_ylabel("Sin(theta)")
@@ -65,6 +65,7 @@ circle =plt.Circle((0, 0), 1, color="lightgray", fill=False)
 ax_phase.add_artist(circle)
 
 scatter = ax_phase.scatter([], [], s=50, color="blue", alpha=0.5)
+#so we can plot the centroid of the distribution
 (centroid_line,) = ax_phase.plot([], [], color = "red", lw = 2)
 (centroid_point,) = ax_phase.plot([], [], color = "red", markersize=8)
 
@@ -79,6 +80,9 @@ def other_params(thetas):
     rcosphi = np.real((1/len(thetas)) * np.sum(np.exp(thetas * 1j)))
     rsinphi = np.imag((1/len(thetas)) * np.sum(np.exp(thetas * 1j)))
     return r, phi, rcosphi, rsinphi
+
+#we also want a graph of r with respect to time.
+ax_r_time.set_title("Order Parameter r Versus Time")
 
 def update(frame:int):
     global thetas
