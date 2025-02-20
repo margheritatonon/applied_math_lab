@@ -66,6 +66,17 @@ ax_phase.add_artist(circle)
 
 scatter = ax_phase.scatter([], [], s=50, color="blue", alpha=0.5)
 
+#now we want a funciton that computes r and phi so that we can have that at the center of the circle "following" the points
+def other_params(thetas):
+    """
+    Finds r, phi, rcosphi, and rsinphi based on the theta array.
+    """
+    r = np.abs((1/len(thetas)) * np.sum(np.exp(thetas * 1j)))
+    phi = np.angle((1/len(thetas)) * np.sum(np.exp(thetas * 1j)))
+    rcosphi = np.real((1/len(thetas)) * np.sum(np.exp(thetas * 1j)))
+    rsinphi = np.imag((1/len(thetas)) * np.sum(np.exp(thetas * 1j)))
+    return r, phi, rcosphi, rsinphi
+
 def update(frame:int):
     global thetas
 
