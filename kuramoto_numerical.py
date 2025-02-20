@@ -47,7 +47,7 @@ print(f"omega.shape = {omega.shape}")
 for i, k in enumerate(kvalues):
     #rs = []
     print(k)
-    sol = solve_ivp(mean_field_odes, t_span, theta, t_eval, args=(omega, k))
+    sol = solve_ivp(mean_field_odes, t_span, theta, t_eval, args=(omega, k),)
     theta = sol.y
     #for n in range(num_iters):
         #theta = theta + dt * thetas_dot #integrating numerically
@@ -88,8 +88,8 @@ ax.errorbar(
         label="Empirical",
         color="red",
     )
-ax.set_xlabel("Coupling strength (K)")
-ax.set_ylabel("Order parameter (r)")
+ax.set_xlabel("k")
+ax.set_ylabel("r")
 ax.set_title("Kuramoto model")
 ax.legend()
 
