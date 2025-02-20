@@ -52,7 +52,7 @@ thetas, omegas = initialize_oscillators(n, sigma, concentration=conc)
 
 #plots:
 fig, (ax_phase, ax_r_time,) = plt.subplots(1, 2, figsize=(12, 6))
-ax_phase.set_title("Kuramoto Model")
+ax_phase.set_title(f"Kuramoto Model for k = {K}")
 ax_phase.set_xlabel("Cos(theta)")
 ax_phase.set_ylabel("Sin(theta)")
 ax_phase.set_xlim(-1.1, 1.1)
@@ -144,6 +144,9 @@ kvalues = np.linspace(kmin, kmax, 20)
 print(kvalues)
 
 #for each of these values of k, we need to find r_inf
+#K = kvalues[0]
+#animate_circle()
+#we have r = np.sqrt(1-k_critical/k) for k > kcritical (this is the analytical solution)
 
 #plotting theoretical values:
 ranges = np.linspace(0, 5, 100)
