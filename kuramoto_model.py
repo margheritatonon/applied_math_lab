@@ -123,7 +123,7 @@ def animate_circle():
     plt.tight_layout()
     plt.show()
 
-animate_circle()
+#animate_circle()
 
 
 
@@ -135,6 +135,16 @@ g_zero = prob_distribution(0)
 
 k_critical = 2 / (np.pi * g_zero)
 print(k_critical)
+kmin = k_critical/3
+kmax = 3*k_critical
+print(f"kmin, kmax = ({kmin}, {kmax})")
+
+#we sample 20 values of k between kmin and kmax:
+kvalues = np.linspace(kmin, kmax, 20)
+print(kvalues)
+
+#for each of these values of k, we need to find r_inf
+
 
 #plotting theoretical values:
 ranges = np.linspace(0, 5, 100)
