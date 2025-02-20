@@ -87,7 +87,7 @@ print(means)
 print(stds)
 
 
-
+#this is solving it analytically
 to_plot = []
 for k in kvalues:
     if k >= k_critical:
@@ -97,41 +97,19 @@ for k in kvalues:
 arr_to_plot = np.array(to_plot)
 print(to_plot)
 print(len(to_plot))
+
+#if we were to solve the function numerically, we have the 1 = integral
+
     
 fig, ax_bifurcation = plt.subplots(1, 1, figsize=(12, 6))
 ax_bifurcation.plot(kvalues, arr_to_plot, label = "Theoretical")
 #ax_bifurcation.scatter(kvalues, np.array(means), label = "Empirical", color = "red")
 ax_bifurcation.errorbar(kvalues, np.array(means), yerr=[stds, stds], label = "Empirical", color = "red", fmt = "o")
 
+#we now need to identify the approximate value of kc and compare it with the theoretical value
 
-#print(avg_rs_for_k)
-
-#print(integrate_for_r(1000, 0.5))
-#print(integrate_for_r(1000, 1))
-#print(integrate_for_r(1000, 2))
-#print(integrate_for_r(1000, 5))
-
-
-
-
-
-
-"""fig, ax = plt.subplots()
-ax.plot(kvalues, arr_to_plot, label="Theoretical", color="blue")
-    # Plot the empirical order parameter as points with error bars
-ax.errorbar(
-        kvalues,
-        ls_r_q50,
-        yerr=[ls_r_q50 - ls_r_q10, ls_r_q90 - ls_r_q50],
-        fmt="o",
-        label="Empirical",
-        color="red",
-    )
-ax.set_xlabel("k")
-ax.set_ylabel("r")
-ax.set_title("Kuramoto model")
-ax.legend()
-"""
 
 plt.tight_layout()
-plt.savefig("kuramoto.png")
+plt.show()
+#plt.savefig("kuramoto.png")
+
