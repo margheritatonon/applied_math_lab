@@ -86,8 +86,8 @@ ax_r_time.set_title("Order Parameter r Versus Time")
 ax_r_time.set_ylabel("r")
 ax_r_time.set_xlabel("Time")
 ax_r_time.set_ylim(0, 1)
-ls_order_param = [0] * 500
-ls_t = np.arange(0, 500) * dt
+ls_order_param = [] #[0] * 500
+ls_t = [] #np.arange(0, 500) * dt
 (line_order_param,) = ax_r_time.plot(ls_t, ls_order_param, color="red")
 
 def update(frame:int):
@@ -110,8 +110,11 @@ def update(frame:int):
     centroid_point.set_data([rcosphi], [rsinphi])
 
     ls_order_param.append(r)
-    ls_order_param.pop(0)
+    #ls_order_param.pop(0)
+    ls_t.append(frame*dt)
     line_order_param.set_data(ls_t, ls_order_param)
+    ax_r_time.relim()
+    ax_r_time.autoscale_view()
 	
     return [scatter, centroid_line, centroid_point, line_order_param]
 
@@ -131,6 +134,7 @@ def prob_distribution(omega, sigma:float=sigma):
 g_zero = prob_distribution(0)
 
 k_critical = 2 / (np.pi * g_zero)
+print(k_critical)
 
 #plotting theoretical values:
 ranges = np.linspace(0, 5, 100)
@@ -159,7 +163,7 @@ for k in ranges:
     rs = integrate_for_r(1000, k)
     avg_rs_for_k.append(rs)
 
-print(avg_rs_for_k)
+#print(avg_rs_for_k)
 
 #print(integrate_for_r(1000, 0.5))
 #print(integrate_for_r(1000, 1))
