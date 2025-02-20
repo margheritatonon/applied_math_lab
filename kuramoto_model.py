@@ -133,7 +133,7 @@ def prob_distribution(omega, sigma:float=sigma):
 
 g_zero = prob_distribution(0)
 
-k_critical = 2 / (np.pi * g_zero)
+k_critical = 2 / (np.pi * g_zero) #this is the theoretical k critical value
 print(k_critical)
 kmin = k_critical/3
 kmax = 3*k_critical
@@ -144,7 +144,6 @@ kvalues = np.linspace(kmin, kmax, 20)
 print(kvalues)
 
 #for each of these values of k, we need to find r_inf
-
 
 #plotting theoretical values:
 ranges = np.linspace(0, 5, 100)
