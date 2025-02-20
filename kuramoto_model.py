@@ -20,7 +20,7 @@ def initialize_oscillators(n:int, sigma:float = 1.0, concentration:str = "disper
 def mean_field_odes(t, thetas, omegas, K):
     thetas = np.mod(thetas, 2 * np.pi)
     #frame of reference: 0
-    r = (1/len(thetas)) * np.sum(np.exp(thetas * 1j))
+    r = np.abs((1/len(thetas)) * np.sum(np.exp(thetas * 1j)))
     thetas_dot = omegas - K*r*np.sin(thetas)
     return thetas_dot
 
@@ -41,7 +41,7 @@ def pairwise_odes(t, thetas, omegas, K):
 
 
 #parameters:
-K = 7
+K = 1
 n = 100
 sigma = 1
 dt = 0.01

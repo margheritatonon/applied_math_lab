@@ -28,8 +28,8 @@ num_iters = 10000
 t_range = np.linspace(0, num_iters, num_iters)
 
 
-#fig, axes = plt.subplots(5, 4, figsize = (8,8))
-#axes = axes.flatten()
+fig, axes = plt.subplots(5, 4, figsize = (8,8))
+axes = axes.flatten()
 
 ls_r_q10 = np.zeros_like(kvalues)
 ls_r_q50 = np.zeros_like(kvalues)
@@ -44,28 +44,48 @@ print(f"theta.shape = {theta.shape}")
 print(f"theta.flatten().shape = {theta.flatten().shape}")
 print(f"omega.shape = {omega.shape}")
 
+all_rs = []
 for i, k in enumerate(kvalues):
-    #rs = []
-    print(k)
-    sol = solve_ivp(mean_field_odes, t_span, theta, t_eval, args=(omega, k),)
-    theta = sol.y
-    #for n in range(num_iters):
-        #theta = theta + dt * thetas_dot #integrating numerically
-        #r = np.abs((1/len(theta)) * np.sum(np.exp(theta * 1j)))
-        #rs.append(r)
-    theta = np.mod(theta, 2 * np.pi)
-    r = np.abs((1/len(theta)) * np.sum(np.exp(theta * 1j))) #the absolute value is the modulus
-    ls_r_q10[i] = np.percentile(r, 10)
-    ls_r_q50[i] = np.percentile(r, 50)
-    ls_r_q90[i] = np.percentile(r, 90)
-    theta = theta[:, -1]
+    rs = []
+    #print(k)
+    #sol = solve_ivp(mean_field_odes, t_span, theta, t_eval, args=(omega, k),)
+    #theta = sol.y
+    #print(theta)
+    for n in range(num_iters):
+        thetas_dot = mean_field_odes(1, theta, omega, k)
+        theta = theta + dt * thetas_dot #integrating numerically
+        theta = np.mod(theta, 2 * np.pi)
+        r = np.abs((1/len(theta)) * np.sum(np.exp(theta * 1j)))
+        rs.append(r)
+    #theta = np.mod(theta, 2 * np.pi)
+    #r = np.abs((1/len(theta)) * np.sum(np.exp(theta * 1j))) #the absolute value is the modulus
+    #ls_r_q10[i] = np.percentile(r, 10)
+    #ls_r_q50[i] = np.percentile(r, 50)
+    #ls_r_q90[i] = np.percentile(r, 90)
+    #theta = theta[:, -1]
     #for plotting:
-    #ax = axes[i]  
-    #ax.scatter(t_range, np.array(rs), s=2)
-    #ax.set_ylim(0, 1)
-    #ax.set_title(f"k = {k:.2f}") 
-    #ax.set_ylabel("r")
-    #ax.set_xlabel("t")
+    ax = axes[i]  
+    ax.scatter(t_range, np.array(rs), s=2)
+    ax.set_ylim(0, 1)
+    ax.set_title(f"k = {k:.2f}") 
+    ax.set_ylabel("r")
+    ax.set_xlabel("t")
+    all_rs.append(rs)
+
+plt.savefig("20plots.png")
+plt.close()
+
+means = []
+stds = []
+for i, k in enumerate(kvalues):
+    mean_r = np.mean(all_rs[i][-300:])
+    std_r = np.std(all_rs[i][-300:])
+    means.append(mean_r)
+    stds.append(std_r)
+
+print(means)
+print(stds)
+
 
 
 to_plot = []
@@ -75,9 +95,28 @@ for k in kvalues:
     else:
         to_plot.append(0)
 arr_to_plot = np.array(to_plot)
+print(to_plot)
+print(len(to_plot))
+    
+fig, ax_bifurcation = plt.subplots(1, 1, figsize=(12, 6))
+ax_bifurcation.plot(kvalues, arr_to_plot, label = "Theoretical")
+#ax_bifurcation.scatter(kvalues, np.array(means), label = "Empirical", color = "red")
+ax_bifurcation.errorbar(kvalues, np.array(means), yerr=[stds, stds], label = "Empirical", color = "red", fmt = "o")
 
 
-fig, ax = plt.subplots()
+#print(avg_rs_for_k)
+
+#print(integrate_for_r(1000, 0.5))
+#print(integrate_for_r(1000, 1))
+#print(integrate_for_r(1000, 2))
+#print(integrate_for_r(1000, 5))
+
+
+
+
+
+
+"""fig, ax = plt.subplots()
 ax.plot(kvalues, arr_to_plot, label="Theoretical", color="blue")
     # Plot the empirical order parameter as points with error bars
 ax.errorbar(
@@ -92,7 +131,7 @@ ax.set_xlabel("k")
 ax.set_ylabel("r")
 ax.set_title("Kuramoto model")
 ax.legend()
-
+"""
 
 plt.tight_layout()
-plt.show()
+plt.savefig("kuramoto.png")
