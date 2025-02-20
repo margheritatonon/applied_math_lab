@@ -65,6 +65,9 @@ circle =plt.Circle((0, 0), 1, color="lightgray", fill=False)
 ax_phase.add_artist(circle)
 
 scatter = ax_phase.scatter([], [], s=50, color="blue", alpha=0.5)
+(centroid_line,) = ax_phase.plot([], [], color = "red", lw = 2)
+(centroid_point,) = ax_phase.plot([], [], color = "red", markersize=8)
+
 
 #now we want a funciton that computes r and phi so that we can have that at the center of the circle "following" the points
 def other_params(thetas):
@@ -90,8 +93,13 @@ def update(frame:int):
     y = np.sin(thetas)
     data = np.vstack((x, y)).T
     scatter.set_offsets(data)
+
+    #so that we can plot the red line in the middle of the circle
+    r, phi, rcosphi, rsinphi = other_params(thetas)
+    centroid_line.set_data([0, rcosphi], [0, rsinphi])
+    centroid_point.set_data([rcosphi], [rsinphi])
 	
-    return [scatter]
+    return [scatter, centroid_line, centroid_point]
 
 def animate_circle():
     ani = animation.FuncAnimation(fig, update, blit=True, interval=1)
