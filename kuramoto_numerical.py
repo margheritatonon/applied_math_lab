@@ -21,7 +21,7 @@ def prob_distribution(omega, sigma:float=sigma, dist:str = "cauchy"):
 g_zero = prob_distribution(0, dist=distr)
 
 k_critical = 2 / (np.pi * g_zero) #this is the theoretical k critical value for any distribution
-print(k_critical)
+print(f"k_critical = {k_critical}")
 kmin = k_critical/3
 kmax = 3*k_critical
 print(f"kmin, kmax = ({kmin}, {kmax})")
@@ -59,12 +59,6 @@ for i, k in enumerate(kvalues):
         theta = np.mod(theta, 2 * np.pi)
         r = np.abs((1/len(theta)) * np.sum(np.exp(theta * 1j)))
         rs.append(r)
-    #theta = np.mod(theta, 2 * np.pi)
-    #r = np.abs((1/len(theta)) * np.sum(np.exp(theta * 1j))) #the absolute value is the modulus
-    #ls_r_q10[i] = np.percentile(r, 10)
-    #ls_r_q50[i] = np.percentile(r, 50)
-    #ls_r_q90[i] = np.percentile(r, 90)
-    #theta = theta[:, -1]
     #for plotting:
     ax = axes[i]  
     ax.scatter(t_range, np.array(rs), s=2)
@@ -74,7 +68,7 @@ for i, k in enumerate(kvalues):
     ax.set_xlabel("t")
     all_rs.append(rs)
 
-plt.savefig("20plots.png")
+#plt.savefig("20plots.png")
 plt.close()
 
 means = []
@@ -85,8 +79,14 @@ for i, k in enumerate(kvalues):
     means.append(mean_r)
     stds.append(std_r)
 
-print(means)
+print(np.mean(all_rs[i][-300:]))
 print(stds)
+
+
+#if we were to solve the function numerically, we have the 1 = integral, so integral - 1 = 0 and we can use newtons method
+
+def integral(theta, k, r):
+    return ((np.cos(theta))**2) *  prob_distribution(k*r*np.sin(theta), sigma = sigma, dist = distr)
 
 
 #this is solving it analytically
@@ -112,22 +112,22 @@ elif distr == "normal":
             to_plot.append(0)
         else:
             mu = (k - k_critical)/k_critical
-            r = np.sqrt(16/(np.pi*(k_critical**3))) * np.sqrt(mu / (-1*normal_second_derivative(0)))
+            g0 = -1 / (sigma**3 * np.sqrt(2 * np.pi)) #because we are already evaluating at omega = 0
+            #r = np.sqrt(16/(np.pi*(k_critical**3))) * np.sqrt(mu / (-1*normal_second_derivative(0)))
+            r =  np.sqrt(mu / (-1*g0)) * np.sqrt(16 / np.pi * (k_critical**3))
+            r = np.minimum(r, 1)
             to_plot.append(r)
     arr_to_plot = np.array(to_plot)
 
 
-#if we were to solve the function numerically, we have the 1 = integral, so integral - 1 = 0 and we can use newtons method
-def distribution(w):
-    pass
-def integral(theta, k, r):
-    return ((np.cos(theta))**2) *  distribution(k*r*np.sin(theta))
     
 fig, ax_bifurcation = plt.subplots(1, 1, figsize=(12, 6))
 ax_bifurcation.plot(kvalues, arr_to_plot, label = "Theoretical")
 #ax_bifurcation.scatter(kvalues, np.array(means), label = "Empirical", color = "red")
 ax_bifurcation.errorbar(kvalues, np.array(means), yerr=[stds, stds], label = "Empirical", color = "red", fmt = "o")
 ax_bifurcation.set_title(f"Empirical and Theoretical r Versus k for {distr.capitalize()} Distribution")
+ax_bifurcation.set_xlabel("k")
+ax_bifurcation.set_ylabel("r")
 
 #we now need to identify the approximate value of kc and compare it with the theoretical value
 
