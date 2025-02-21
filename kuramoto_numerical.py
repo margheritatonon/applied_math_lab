@@ -41,7 +41,7 @@ axes = axes.flatten()
 
 
 
-theta, omega = initialize_oscillators(n, sigma, conc)
+theta, omega = initialize_oscillators(n, sigma, conc, distribution=distr)
 print(f"theta.shape = {theta.shape}")
 print(f"theta.flatten().shape = {theta.flatten().shape}")
 print(f"omega.shape = {omega.shape}")
