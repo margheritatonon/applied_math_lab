@@ -51,7 +51,7 @@ def pairwise_odes(t, thetas, omegas, K):
 
 #parameters:
 K = 5
-n = 800
+n = 100
 sigma = 1
 dt = 0.01
 conc = "dispersed"
