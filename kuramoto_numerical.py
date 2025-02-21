@@ -8,10 +8,13 @@ from kuramoto_model import sigma, n, dt, conc, distr, initialize_oscillators, me
 
 #BIFURCATION DIAGRAM
 def prob_distribution(omega, sigma:float=sigma, dist:str = "cauchy"):
+    """
+        Returns the probability distribution values of either a normal or cauchy distribution
+    """
     if dist == "normal":
         return (1 / np.sqrt(2*np.pi*(sigma**2))) * np.exp(-(omega**2) / (2 * sigma**2))
-    elif dist == "cauchy":
-        return 1
+    elif dist == "cauchy": #we assume the scale parameter gamma = 1
+        return (1/np.pi) * (1/(omega**2 + 1))
     else:
         raise ValueError("Invalid distribution. Enter \"normal\" or \"cauchy\"")
 
@@ -36,13 +39,7 @@ t_range = np.linspace(0, num_iters, num_iters)
 fig, axes = plt.subplots(5, 4, figsize = (8,8))
 axes = axes.flatten()
 
-ls_r_q10 = np.zeros_like(kvalues)
-ls_r_q50 = np.zeros_like(kvalues)
-ls_r_q90 = np.zeros_like(kvalues)
-t_span = (0, 1000)
-t_eval = np.arange(0, 1000, dt)
-idx_end = int(len(t_eval) * 0.25)
-t_eval = t_eval[-idx_end:]
+
 
 theta, omega = initialize_oscillators(n, sigma, conc)
 print(f"theta.shape = {theta.shape}")
@@ -95,7 +92,7 @@ print(stds)
 #this is solving it analytically
 #need this because need it for the rinf theoretical computations
 def normal_second_derivative(omega, sigma:float = sigma): 
-    return ((omega**2)/(sigma**2) - 1) * (1/(np.sqrt(2*np.pi*sigma**6))) * np.exp(-(omega**2)/(2*sigma**2))
+    return (((omega**2)/(sigma**2)) - 1) * (1/(np.sqrt(2*np.pi*sigma**6))) * np.exp(-(omega**2)/(2*sigma**2))
 
 if distr == "cauchy":
     to_plot = []
@@ -130,6 +127,7 @@ fig, ax_bifurcation = plt.subplots(1, 1, figsize=(12, 6))
 ax_bifurcation.plot(kvalues, arr_to_plot, label = "Theoretical")
 #ax_bifurcation.scatter(kvalues, np.array(means), label = "Empirical", color = "red")
 ax_bifurcation.errorbar(kvalues, np.array(means), yerr=[stds, stds], label = "Empirical", color = "red", fmt = "o")
+ax_bifurcation.set_title(f"Empirical and Theoretical r Versus k for {distr.capitalize()} Distribution")
 
 #we now need to identify the approximate value of kc and compare it with the theoretical value
 
