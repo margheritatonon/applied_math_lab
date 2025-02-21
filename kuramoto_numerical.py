@@ -108,25 +108,18 @@ r_solution = brentq(root_find, 0, 1, args=(k, sigma, distr)) #r is between 0 and
 
 #now we do this for all values of k
 theoretical_r_values = []
-print("entering ks loop:")
 for ks in kvalues:
-    print(ks)
     try:
         r_solution = brentq(root_find, 0, 1, args=(ks, sigma, distr)) #r is between 0 and 1, always
         theoretical_r_values.append(r_solution)
-        print(r_solution)
     except:
         theoretical_r_values.append(0)
-        print(0)
-    print("---\n")
 
-print(f"r_values = {theoretical_r_values}") #these are always the same!!!!
+print(f"r_values = {theoretical_r_values}")
 
-#this is solving it analytically
-#need this because need it for the rinf theoretical computations
+#this is solving it analytically - but we plot everything below using the numerical integration
 def normal_second_derivative(omega, sigma:float = sigma): 
     return (((omega**2)/(sigma**2)) - 1) * (1/(np.sqrt(2*np.pi*sigma**6))) * np.exp(-(omega**2)/(2*sigma**2))
-
 if distr == "cauchy":
     to_plot = []
     for k in kvalues:
@@ -137,7 +130,6 @@ if distr == "cauchy":
     arr_to_plot = np.array(to_plot)
     #print(to_plot)
     #print(len(to_plot))
-
 elif distr == "normal":
     to_plot = []
     for k in kvalues:
@@ -151,12 +143,11 @@ elif distr == "normal":
             r = np.minimum(r, 1)
             to_plot.append(r)
     arr_to_plot = np.array(to_plot)
-
-
 theoretical_rs_from_integration = np.array(theoretical_r_values)
 
+#plotting:
 fig, ax_bifurcation = plt.subplots(1, 1, figsize=(12, 6))
-ax_bifurcation.plot(kvalues, theoretical_rs_from_integration, label = "Theoretical")
+ax_bifurcation.plot(kvalues, theoretical_rs_from_integration, label = "Theoretical") #we use the values from numerical integration
 #ax_bifurcation.scatter(kvalues, np.array(means), label = "Empirical", color = "red")
 ax_bifurcation.errorbar(kvalues, np.array(means), yerr=[stds, stds], label = "Empirical", color = "red", fmt = "o")
 #ax_bifurcation.set_title(f"Empirical and Theoretical r Versus k for {distr.capitalize()} Distribution")
@@ -169,5 +160,5 @@ ax_bifurcation.set_ylabel("r", size = 30)
 
 plt.tight_layout()
 plt.show()
-#plt.savefig("kuramoto.png")
+#plt.savefig(f"kuramoto_{distr}_{n}_rvsk.png")
 
