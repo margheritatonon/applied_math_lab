@@ -62,7 +62,7 @@ thetas, omegas = initialize_oscillators(n, sigma, concentration=conc, distributi
 
 #plots:
 fig, (ax_phase, ax_r_time,) = plt.subplots(1, 2, figsize=(12, 6))
-ax_phase.set_title(f"Kuramoto Model for k = {K}")
+ax_phase.set_title(f"Kuramoto Model for k = {K} and {distr.capitalize()} Distribution")
 ax_phase.set_xlabel("Cos(theta)")
 ax_phase.set_ylabel("Sin(theta)")
 ax_phase.set_xlim(-1.1, 1.1)
