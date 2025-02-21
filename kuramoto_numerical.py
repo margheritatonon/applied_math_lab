@@ -112,7 +112,7 @@ for ks in kvalues:
     r_solution = brentq(root_find, 0, 1, args=(k, sigma, distr)) #r is between 0 and 1, always
     theoretical_r_values.append(r_solution)
 
-print(f"r_values = {theoretical_r_values}")
+print(f"r_values = {theoretical_r_values}") #these are always the same!!!!
 
 #this is solving it analytically
 #need this because need it for the rinf theoretical computations
