@@ -4,15 +4,20 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 #from kuramoto_model import initialize_oscillators, mean_field_odes, pairwise_odes, other_params, update, animate_circle, sigma, n, dt, conc
-from kuramoto_model import sigma, n, dt, conc, initialize_oscillators, mean_field_odes
+from kuramoto_model import sigma, n, dt, conc, distr, initialize_oscillators, mean_field_odes
 
 #BIFURCATION DIAGRAM
-def prob_distribution(omega, sigma:float=sigma):
-    return (1 / np.sqrt(2*np.pi*(sigma**2))) * np.exp(-(omega**2) / (2 * sigma**2))
+def prob_distribution(omega, sigma:float=sigma, dist:str = "cauchy"):
+    if dist == "normal":
+        return (1 / np.sqrt(2*np.pi*(sigma**2))) * np.exp(-(omega**2) / (2 * sigma**2))
+    elif dist == "cauchy":
+        return 1
+    else:
+        raise ValueError("Invalid distribution. Enter \"normal\" or \"cauchy\"")
 
-g_zero = prob_distribution(0)
+g_zero = prob_distribution(0, dist=distr)
 
-k_critical = 2 / (np.pi * g_zero) #this is the theoretical k critical value
+k_critical = 2 / (np.pi * g_zero) #this is the theoretical k critical value for any distribution
 print(k_critical)
 kmin = k_critical/3
 kmax = 3*k_critical
@@ -88,18 +93,38 @@ print(stds)
 
 
 #this is solving it analytically
-to_plot = []
-for k in kvalues:
-    if k >= k_critical:
-        to_plot.append(np.sqrt(1 - k_critical/k))
-    else:
-        to_plot.append(0)
-arr_to_plot = np.array(to_plot)
-print(to_plot)
-print(len(to_plot))
+#need this because need it for the rinf theoretical computations
+def normal_second_derivative(omega, sigma:float = sigma): 
+    return ((omega**2)/(sigma**2) - 1) * (1/(np.sqrt(2*np.pi*sigma**6))) * np.exp(-(omega**2)/(2*sigma**2))
 
-#if we were to solve the function numerically, we have the 1 = integral
+if distr == "cauchy":
+    to_plot = []
+    for k in kvalues:
+        if k >= k_critical:
+            to_plot.append(np.sqrt(1 - k_critical/k))
+        else:
+            to_plot.append(0)
+    arr_to_plot = np.array(to_plot)
+    #print(to_plot)
+    #print(len(to_plot))
 
+elif distr == "normal":
+    to_plot = []
+    for k in kvalues:
+        if k < k_critical:
+            to_plot.append(0)
+        else:
+            mu = (k - k_critical)/k_critical
+            r = np.sqrt(16/(np.pi*(k_critical**3))) * np.sqrt(mu / (-1*normal_second_derivative(0)))
+            to_plot.append(r)
+    arr_to_plot = np.array(to_plot)
+
+
+#if we were to solve the function numerically, we have the 1 = integral, so integral - 1 = 0 and we can use newtons method
+def distribution(w):
+    pass
+def integral(theta, k, r):
+    return ((np.cos(theta))**2) *  distribution(k*r*np.sin(theta))
     
 fig, ax_bifurcation = plt.subplots(1, 1, figsize=(12, 6))
 ax_bifurcation.plot(kvalues, arr_to_plot, label = "Theoretical")

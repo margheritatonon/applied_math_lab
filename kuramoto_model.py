@@ -3,7 +3,10 @@ from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-def initialize_oscillators(n:int, sigma:float = 1.0, concentration:str = "dispersed"):
+def initialize_oscillators(n:int, sigma:float = 1.0, concentration:str = "dispersed", distribution:str = "cauchy"):
+    """
+    Initializes n oscillators, either dispersed or concentrated, from a cauchy or normal distribution.
+    """
     #draw theta from uniform distribution
     if concentration == "dispersed":
         thetas = np.random.uniform(0, 2*np.pi, n)
@@ -12,8 +15,14 @@ def initialize_oscillators(n:int, sigma:float = 1.0, concentration:str = "disper
     else:
         raise ValueError("Invalid concentration value. You must input \"dispersed\" or \"concentrated\"")
     
-    #draw omega from normal distribution
-    omegas = np.random.normal(0, sigma, n)
+    if distribution == "cauchy":
+        #draw omega from normal distribution
+        omegas = np.random.standard_cauchy(n)
+    elif distribution == "normal":
+        #draw omega from normal distribution
+        omegas = np.random.normal(0, sigma, n)
+    else:
+        raise ValueError("Invalid distribution. Enter \"normal\" or \"cauchy\"")
 
     return (thetas, omegas)
 
@@ -41,14 +50,15 @@ def pairwise_odes(t, thetas, omegas, K):
 
 
 #parameters:
-K = 1
+K = 5
 n = 100
 sigma = 1
 dt = 0.01
 conc = "dispersed"
+distr = "normal"
 
 #initializing oscillators
-thetas, omegas = initialize_oscillators(n, sigma, concentration=conc)
+thetas, omegas = initialize_oscillators(n, sigma, concentration=conc, distribution=distr)
 
 #plots:
 fig, (ax_phase, ax_r_time,) = plt.subplots(1, 2, figsize=(12, 6))
@@ -113,8 +123,10 @@ def update(frame:int):
     #ls_order_param.pop(0)
     ls_t.append(frame*dt)
     line_order_param.set_data(ls_t, ls_order_param)
+    #ax_r_time.set_xlim(0, max(ls_t)) if max(ls_t) > 1 else 1
     ax_r_time.relim()
     ax_r_time.autoscale_view()
+    #fig.canvas.draw_idle()
 	
     return [scatter, centroid_line, centroid_point, line_order_param]
 
@@ -123,69 +135,5 @@ def animate_circle():
     plt.tight_layout()
     plt.show()
 
-#animate_circle()
-
-
-
-#BIFURCATION DIAGRAM
-def prob_distribution(omega, sigma:float=sigma):
-    return (1 / np.sqrt(2*np.pi*(sigma**2))) * np.exp(-(omega**2) / (2 * sigma**2))
-
-g_zero = prob_distribution(0)
-
-k_critical = 2 / (np.pi * g_zero) #this is the theoretical k critical value
-print(k_critical)
-kmin = k_critical/3
-kmax = 3*k_critical
-print(f"kmin, kmax = ({kmin}, {kmax})")
-
-#we sample 20 values of k between kmin and kmax:
-kvalues = np.linspace(kmin, kmax, 20)
-print(kvalues)
-
-#for each of these values of k, we need to find r_inf
-#K = kvalues[0]
-#animate_circle()
-#we have r = np.sqrt(1-k_critical/k) for k > kcritical (this is the analytical solution)
-
-#plotting theoretical values:
-ranges = np.linspace(0, 5, 100)
-to_plot = []
-for k in ranges:
-    if k < k_critical:
-        to_plot.append(0)
-    else:
-        to_plot.append(np.sqrt(1 - k_critical/k))
-arr_to_plot = np.array(to_plot)
-
-#empirical:
-def integrate_for_r(num_iters, K, dt:float = dt):
-    theta, omega = initialize_oscillators(1000, sigma)
-    thetas_dot = mean_field_odes(1, theta, omega, K)
-    rs = []
-    for i in range(num_iters):
-        theta = theta + dt * thetas_dot
-        r = np.abs((1/len(theta)) * np.sum(np.exp(theta * 1j))) #the absolute value is the modulus
-        rs.append(r)
-    #print(len(rs[-11:-1]))
-    return np.sum(np.array(rs[-11:-1])) / 10
-
-avg_rs_for_k = []
-for k in ranges:
-    rs = integrate_for_r(1000, k)
-    avg_rs_for_k.append(rs)
-
-#print(avg_rs_for_k)
-
-#print(integrate_for_r(1000, 0.5))
-#print(integrate_for_r(1000, 1))
-#print(integrate_for_r(1000, 2))
-#print(integrate_for_r(1000, 5))
-
-fig, ax_bifurcation = plt.subplots(1, 1, figsize=(12, 6))
-plt.plot(ranges, arr_to_plot, label = "Theoretical")
-plt.scatter(ranges, np.array(avg_rs_for_k), label = "Empirical", color = "red")
-plt.title("Bifurcation Diagram")
-plt.xlabel("Coupling Strength (K)")
-plt.ylabel("Order Parameter (r)")
-#plt.show()
+if __name__ == "__main__":
+    animate_circle()
