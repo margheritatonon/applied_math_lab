@@ -47,12 +47,12 @@ thetas_final = sol.y[:, -1]
 r_values = [other_params(sol.y[:, i])[0] for i in range(len(sol.t))] #finds r over the time we set
 
 fig, (ax_initial, ax_final, ax_time_final) = plt.subplots(1, 3, figsize=(18, 6))
-fig.suptitle(f"Initial and Final Frames for k = {K}, {distr.capitalize()} Distribution, and {conc.capitalize()} Concentration", fontsize=16)
+fig.suptitle(f"Initial and Final Frames for k = {K}, {distr.capitalize()} Distribution, and {conc.capitalize()} Concentration", fontsize=23)
 
 def plot_phase(ax, thetas, title):
-    ax.set_title(title)
-    ax.set_xlabel("Cos(theta)")
-    ax.set_ylabel("Sin(theta)")
+    ax.set_title(title, size = 20)
+    ax.set_xlabel("Cos(theta)", size = 13)
+    ax.set_ylabel("Sin(theta)", size = 13)
     ax.set_xlim(-1.1, 1.1)
     ax.set_ylim(-1.1, 1.1)
     ax.set_aspect("equal")
@@ -75,9 +75,9 @@ plot_phase(ax_initial, thetas, "Initial State")
 plot_phase(ax_final, thetas_final, "Final State")
 
 ax_time_final.plot(sol.t, r_values, color="red")
-ax_time_final.set_title("Order Parameter r vs Time")
-ax_time_final.set_xlabel("Time")
-ax_time_final.set_ylabel("r")
+ax_time_final.set_title("Order Parameter r vs Time", size = 17)
+ax_time_final.set_xlabel("Time", size = 15)
+ax_time_final.set_ylabel("r", size = 15)
 ax_time_final.set_ylim(0, 1)
 
 plt.tight_layout()
