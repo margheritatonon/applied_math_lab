@@ -55,7 +55,7 @@ n = 100
 sigma = 1
 dt = 0.01
 conc = "dispersed"
-distr = "normal"
+distr = "cauchy"
 
 #initializing oscillators
 thetas, omegas = initialize_oscillators(n, sigma, concentration=conc, distribution=distr)

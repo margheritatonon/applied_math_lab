@@ -25,7 +25,7 @@ g_zero = prob_distribution(0, dist=distr)
 
 
 k_critical = 2 / (np.pi * g_zero) #this is the theoretical k critical value for any distribution
-print(f"k_critical = {k_critical}")
+print(f"k_critical = {k_critical} for n = {n}, distr = {distr}, conc = {conc}")
 kmin = k_critical/3
 kmax = 3*k_critical
 print(f"kmin, kmax = ({kmin}, {kmax})")
