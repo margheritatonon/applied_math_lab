@@ -50,12 +50,12 @@ def pairwise_odes(t, thetas, omegas, K):
 
 
 #parameters:
-K = 5
+K = 1
 n = 100
 sigma = 1
 dt = 0.01
 conc = "dispersed"
-distr = "cauchy"
+distr = "normal"
 
 #initializing oscillators
 thetas, omegas = initialize_oscillators(n, sigma, concentration=conc, distribution=distr)
