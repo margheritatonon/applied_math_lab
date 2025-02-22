@@ -102,7 +102,8 @@ def root_find(r, k, sigma = sigma, d = distr):
     result, _ = quad(integral, -np.pi/2, np.pi/2, args=(k, r, sigma, d))
     return result - 1
 
-r_solution = brentq(root_find, 0, 1, args=(k, sigma, distr)) #r is between 0 and 1, always
+#just an example for r solution
+#r_solution = brentq(root_find, 0, 1, args=(k, sigma, distr)) #r is between 0 and 1, always
 
 #print(f"r_solution = {r_solution}")
 
