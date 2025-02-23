@@ -2,7 +2,7 @@ import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from kuramoto_model import K, n, sigma, dt, conc, distr, other_params
+from kuramoto_model import K, n, sigma, dt, conc, distr, other_params, mean_field_odes, sigma_noise
 
 def initialize_oscillators(n:int, sigma:float = 1.0, concentration:str = "dispersed", distribution:str = "cauchy"):
     """
@@ -27,12 +27,6 @@ def initialize_oscillators(n:int, sigma:float = 1.0, concentration:str = "disper
 
     return (thetas, omegas)
 
-def mean_field_odes(t, thetas, omegas, K):
-    thetas = np.mod(thetas, 2 * np.pi)
-    #frame of reference: 0
-    r = np.abs((1/len(thetas)) * np.sum(np.exp(thetas * 1j)))
-    thetas_dot = omegas - K*r*np.sin(thetas)
-    return thetas_dot
 
 
 #initializing oscillators
@@ -42,12 +36,12 @@ thetas, omegas = initialize_oscillators(n, sigma, concentration=conc, distributi
 t_final = 100
 t_eval = np.arange(0, t_final, dt)
 print(t_eval.shape)
-sol = solve_ivp(mean_field_odes, (0, t_final), thetas, args=(omegas, K), t_eval=t_eval)
+sol = solve_ivp(mean_field_odes, (0, t_final), thetas, args=(omegas, K, sigma_noise), t_eval=t_eval)
 thetas_final = sol.y[:, -1]
 r_values = [other_params(sol.y[:, i])[0] for i in range(len(sol.t))] #finds r over the time we set
 
 fig, (ax_initial, ax_final, ax_time_final) = plt.subplots(1, 3, figsize=(18, 6))
-fig.suptitle(f"Initial and Final Frames for k = {K}, {distr.capitalize()} Distribution, and {conc.capitalize()} Concentration", fontsize=23)
+fig.suptitle(f"k = {K}, {distr.capitalize()} Distribution, {conc.capitalize()} Concentration, and σ = {sigma_noise}", fontsize=23)
 
 def plot_phase(ax, thetas, title):
     ax.set_title(title, size = 20)

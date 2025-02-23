@@ -26,14 +26,14 @@ def initialize_oscillators(n:int, sigma:float = 1.0, concentration:str = "disper
 
     return (thetas, omegas)
 
-def mean_field_odes(t, thetas, omegas, K):
+def mean_field_odes(t, thetas, omegas, K, sigma_noise):
     thetas = np.mod(thetas, 2 * np.pi)
     #frame of reference: 0
-    r = np.abs((1/len(thetas)) * np.sum(np.exp(thetas * 1j)))
-    thetas_dot = omegas - K*r*np.sin(thetas)
+    r = np.abs((1/len(thetas)) * np.sum(np.exp(thetas * 1j))) 
+    thetas_dot = omegas - K*r*np.sin(thetas) + np.random.normal(0, sigma_noise, thetas.shape)
     return thetas_dot
 
-def pairwise_odes(t, thetas, omegas, K):
+def pairwise_odes(t, thetas, omegas, K, sigma_noise):
     thetas = np.mod(thetas, 2*np.pi)
     thetas_dot = []
     for i in range(len(thetas)):
@@ -42,7 +42,7 @@ def pairwise_odes(t, thetas, omegas, K):
             if i == j:
                 next
             else:
-                gamma_ij = (K / len(thetas)) * np.sin(thetas[j] - thetas[i])
+                gamma_ij = (K / len(thetas)) * np.sin(thetas[j] - thetas[i]) + np.random.normal(0, sigma_noise)
                 gamma_js.append(gamma_ij)
         thetai_dot = omegas[i] + np.sum(np.array(gamma_ij))
         thetas_dot.append(thetai_dot)
@@ -50,12 +50,13 @@ def pairwise_odes(t, thetas, omegas, K):
 
 
 #parameters:
-K = 1
-n = 100
+K = 7
+n = 200
 sigma = 1
 dt = 0.01
 conc = "dispersed"
 distr = "cauchy"
+sigma_noise = 5 #standard normal if this is set to 1f
 
 #initializing oscillators
 thetas, omegas = initialize_oscillators(n, sigma, concentration=conc, distribution=distr)
@@ -103,7 +104,7 @@ ls_t = [] #np.arange(0, 500) * dt
 def update(frame:int):
     global thetas
 
-    sol = solve_ivp(mean_field_odes, (0, dt), thetas, args=(omegas, K))
+    sol = solve_ivp(mean_field_odes, (0, dt), thetas, args=(omegas, K, sigma_noise))
     thetas = sol.y[..., -1]
 
     thetas = np.mod(thetas, 2 * np.pi)
