@@ -40,7 +40,7 @@ def bridge_odes(t, x1t, x2t, thetas):
     """
     x1_dot = x2t
     x2_dot = (1/M) * (-D*x2t - K*x1t + F*np.sum(np.cos(thetas)))
-    thetas_dot = omegas - beta * x2_dot * np.sin(thetas)
+    thetas_dot = omegas - beta * x2t * np.sin(thetas)
     return (x1_dot, x2_dot, thetas_dot)
 
 
