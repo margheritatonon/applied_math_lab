@@ -155,6 +155,7 @@ ax_bifurcation.errorbar(kvalues, np.array(means), yerr=[stds, stds], label = "Em
 ax_bifurcation.set_title(f"{distr.capitalize()} Distribution with σ = {sigma}", size = 40)
 ax_bifurcation.set_xlabel("k", size = 30)
 ax_bifurcation.set_ylabel("r", size = 30)
+ax_bifurcation.tick_params(axis='x', labelsize=30)
 
 #we now need to identify the approximate value of kc and compare it with the theoretical value
 

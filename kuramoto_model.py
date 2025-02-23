@@ -52,7 +52,7 @@ def pairwise_odes(t, thetas, omegas, K):
 #parameters:
 K = 1
 n = 100
-sigma = 10
+sigma = 3
 dt = 0.01
 conc = "dispersed"
 distr = "normal"
