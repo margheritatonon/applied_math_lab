@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from kuramoto_model import initialize_oscillators
 
 
 #defining parameters:
@@ -9,7 +8,7 @@ D = 10    #damping
 K = 500   #stiffness
 F = 100   #amplitude of Fcos(theta_i(t))
 beta = 0.01
-n_pedestrians = 500
+n_pedestrians = 5
 
 
 time = 100
@@ -24,8 +23,6 @@ omegas = np.random.normal(0, 1, n_pedestrians) #we are going to draw the omegas 
 x1_0 = 0
 x2_0 = 0
 thetas_0 = np.random.uniform(0, 2*np.pi, n_pedestrians)
-
-
 
 
 def order_parameter_r(theta):
@@ -65,6 +62,3 @@ ax.set_ylabel("r")
 ax.set_xlabel("Time (t)")
 plt.show()
 
-
-
-#then, we plot a graph of r versus n (like we did r vs k and averaging over the last 300 time steps)
