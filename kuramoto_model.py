@@ -26,22 +26,23 @@ def initialize_oscillators(n:int, sigma:float = 1.0, concentration:str = "disper
 
     return (thetas, omegas)
 
-def mean_field_odes(t, thetas, omegas, K, sigma_noise):
+def mean_field_odes(t, thetas, omegas, K, sigma_noise, mu_noise):
     thetas = np.mod(thetas, 2 * np.pi)
     #frame of reference: 0
     r = np.abs((1/len(thetas)) * np.sum(np.exp(thetas * 1j))) 
-    thetas_dot = omegas - K*r*np.sin(thetas) + np.random.normal(0, sigma_noise, thetas.shape)
+    thetas_dot = omegas - K*r*np.sin(thetas) + np.random.normal(mu_noise, sigma_noise, thetas.shape)
     return thetas_dot
 
 
 #parameters:
 K = 7
-n = 200
+n = 100
 sigma = 1
 dt = 0.01
 conc = "dispersed"
 distr = "cauchy"
-sigma_noise = 5 #standard normal if this is set to 1
+sigma_noise = 1 #standard normal if this is set to 1
+mu_noise = 4
 
 #initializing oscillators
 thetas, omegas = initialize_oscillators(n, sigma, concentration=conc, distribution=distr)
@@ -89,7 +90,7 @@ ls_t = [] #np.arange(0, 500) * dt
 def update(frame:int):
     global thetas
 
-    sol = solve_ivp(mean_field_odes, (0, dt), thetas, args=(omegas, K, sigma_noise))
+    sol = solve_ivp(mean_field_odes, (0, dt), thetas, args=(omegas, K, sigma_noise, mu_noise))
     thetas = sol.y[..., -1]
 
     thetas = np.mod(thetas, 2 * np.pi)

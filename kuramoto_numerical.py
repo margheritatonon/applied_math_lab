@@ -7,7 +7,7 @@ from scipy.optimize import brentq
 
 
 #from kuramoto_model import initialize_oscillators, mean_field_odes, pairwise_odes, other_params, update, animate_circle, sigma, n, dt, conc
-from kuramoto_model import sigma, n, dt, conc, distr, initialize_oscillators, mean_field_odes, sigma_noise
+from kuramoto_model import sigma, n, dt, conc, distr, initialize_oscillators, mean_field_odes, sigma_noise, mu_noise
 
 #BIFURCATION DIAGRAM
 def prob_distribution(omega, sigma:float=sigma, dist:str = "cauchy"):
@@ -61,7 +61,7 @@ for i, k in enumerate(kvalues):
     #theta = sol.y
     #print(theta)
     for q in range(num_iters):
-        thetas_dot = mean_field_odes(1, theta, omega, k, sigma_noise)
+        thetas_dot = mean_field_odes(1, theta, omega, k, sigma_noise, mu_noise)
         theta = theta + dt * thetas_dot #integrating numerically
         theta = np.mod(theta, 2 * np.pi)
         r = np.abs((1/len(theta)) * np.sum(np.exp(theta * 1j)))
