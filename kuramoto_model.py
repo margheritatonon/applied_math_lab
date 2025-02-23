@@ -33,21 +33,6 @@ def mean_field_odes(t, thetas, omegas, K, sigma_noise):
     thetas_dot = omegas - K*r*np.sin(thetas) + np.random.normal(0, sigma_noise, thetas.shape)
     return thetas_dot
 
-def pairwise_odes(t, thetas, omegas, K, sigma_noise):
-    thetas = np.mod(thetas, 2*np.pi)
-    thetas_dot = []
-    for i in range(len(thetas)):
-        gamma_js = []
-        for j in range(len(thetas)):
-            if i == j:
-                next
-            else:
-                gamma_ij = (K / len(thetas)) * np.sin(thetas[j] - thetas[i]) + np.random.normal(0, sigma_noise)
-                gamma_js.append(gamma_ij)
-        thetai_dot = omegas[i] + np.sum(np.array(gamma_ij))
-        thetas_dot.append(thetai_dot)
-    return np.array(thetas_dot)
-
 
 #parameters:
 K = 7
@@ -56,7 +41,7 @@ sigma = 1
 dt = 0.01
 conc = "dispersed"
 distr = "cauchy"
-sigma_noise = 5 #standard normal if this is set to 1f
+sigma_noise = 5 #standard normal if this is set to 1
 
 #initializing oscillators
 thetas, omegas = initialize_oscillators(n, sigma, concentration=conc, distribution=distr)
