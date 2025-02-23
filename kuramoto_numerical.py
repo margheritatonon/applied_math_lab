@@ -25,7 +25,7 @@ g_zero = prob_distribution(0, dist=distr)
 
 
 k_critical = 2 / (np.pi * g_zero) #this is the theoretical k critical value for any distribution
-print(f"k_critical = {k_critical} for n = {n}, distr = {distr}, conc = {conc}")
+print(f"k_critical = {k_critical} for n = {n}, distr = {distr}, conc = {conc}, sigma = {sigma}")
 kmin = k_critical/3
 kmax = 3*k_critical
 print(f"kmin, kmax = ({kmin}, {kmax})")
@@ -152,7 +152,7 @@ ax_bifurcation.plot(kvalues, theoretical_rs_from_integration, label = "Theoretic
 #ax_bifurcation.scatter(kvalues, np.array(means), label = "Empirical", color = "red")
 ax_bifurcation.errorbar(kvalues, np.array(means), yerr=[stds, stds], label = "Empirical", color = "red", fmt = "o")
 #ax_bifurcation.set_title(f"Empirical and Theoretical r Versus k for {distr.capitalize()} Distribution")
-ax_bifurcation.set_title(f"{distr.capitalize()} Distribution with n = {n}", size = 40)
+ax_bifurcation.set_title(f"{distr.capitalize()} Distribution with σ = {sigma}", size = 40)
 ax_bifurcation.set_xlabel("k", size = 30)
 ax_bifurcation.set_ylabel("r", size = 30)
 
