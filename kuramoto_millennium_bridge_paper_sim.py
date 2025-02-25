@@ -60,9 +60,10 @@ def calculating_maxes(theta0, omega0, initialx1=0.0, initialx2=0.0, t_add = t_ad
 
     return max_order_parameters
 
-max_r_values = calculating_maxes(thetas, omegas)
-plt.scatter(np.arange(2, 2 + len(max_r_values) * t_add, t_add), max_r_values)
-plt.show()
+if __name__ == "__main__":
+    max_r_values = calculating_maxes(thetas, omegas)
+    plt.scatter(np.arange(2, 2 + len(max_r_values) * t_add, t_add), max_r_values)
+    plt.show()
 
-print(calculating_maxes(thetas, omegas))
-print(len(calculating_maxes(thetas, omegas)))
+    print(calculating_maxes(thetas, omegas))
+    print(len(calculating_maxes(thetas, omegas)))
