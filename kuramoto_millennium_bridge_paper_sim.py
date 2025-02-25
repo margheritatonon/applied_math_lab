@@ -17,8 +17,8 @@ n_pedestrians = 2
 omegas = np.random.normal(0, 1, n_pedestrians)  #initial frequencies of pedestrians
 thetas = np.random.uniform(0, 2 * np.pi, n_pedestrians) #initial phase of pedestrians (dispersed over whole circle, not concentrated)
 
-t_add = 100 #we will add a pedestrian every 100 time
-time = 100 #total time that we let the model run for
+t_add = 1000 #we will add a pedestrian every 1000 time
+time = 1000 #total time that we let the model run for
 dt = 0.01
 time_steps = int(time/dt)
 time_pts = np.linspace(0, time, time_steps)
@@ -38,13 +38,13 @@ def calculating_maxes(theta0, omega0, initialx1=0.0, initialx2=0.0, t_add = t_ad
     for i, t in enumerate(time_pts):
         if i % t_add == 0:  #add a pedestrian
             max_order_parameters.append(max_r_in_interval)
-            print(max_r_in_interval)
+            #print(max_r_in_interval)
             max_r_in_interval = 0 #we reset the r in the inveral to 0
             #also add a line to include the maximum amplitude
             omega0 = np.append(omega0, np.random.normal(0, 1))
             theta0 = np.append(theta0, np.random.uniform(0, 2 * np.pi))
-            print(theta0.shape)
-            print("\n")
+            #print(theta0.shape)
+            #print("\n")
         
         #computing odes and evolving the system
         x1_dot, x2_dot, thetas_dot = bridge_odes(t, initialx1, initialx2, theta0, omega0)
@@ -52,6 +52,7 @@ def calculating_maxes(theta0, omega0, initialx1=0.0, initialx2=0.0, t_add = t_ad
         initialx2 += x2_dot * dt
         theta0 += thetas_dot * dt
         theta0 = np.mod(theta0, 2 * np.pi)
+        #print(theta0.shape)
 
 
         #computing max order parameter r
@@ -62,11 +63,14 @@ def calculating_maxes(theta0, omega0, initialx1=0.0, initialx2=0.0, t_add = t_ad
 
 if __name__ == "__main__":
     max_r_values = calculating_maxes(thetas, omegas)
+    pedestrian_counts = np.arange(2, 2 + len(max_r_values), 1)
+
+
     fig, axr = plt.subplots(1,1)
-    axr.scatter(np.arange(2, 2 + len(max_r_values) * t_add, t_add), max_r_values)
+    axr.scatter(pedestrian_counts, max_r_values)
     axr.set_xlabel("Number of Pedestrians Added")
     axr.set_ylabel("Maximum Order Parameter (r)")
-    axr.set_title("Maximum order parameter versus new pedestrian was added")
+    axr.set_title("Maximum Order Parameter Under Gradual Pedestrian Addition")
     plt.show()
 
     print(calculating_maxes(thetas, omegas))
