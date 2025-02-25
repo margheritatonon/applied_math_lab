@@ -62,7 +62,11 @@ def calculating_maxes(theta0, omega0, initialx1=0.0, initialx2=0.0, t_add = t_ad
 
 if __name__ == "__main__":
     max_r_values = calculating_maxes(thetas, omegas)
-    plt.scatter(np.arange(2, 2 + len(max_r_values) * t_add, t_add), max_r_values)
+    fig, axr = plt.subplots(1,1)
+    axr.scatter(np.arange(2, 2 + len(max_r_values) * t_add, t_add), max_r_values)
+    axr.set_xlabel("Number of Pedestrians Added")
+    axr.set_ylabel("Maximum Order Parameter (r)")
+    axr.set_title("Maximum order parameter versus new pedestrian was added")
     plt.show()
 
     print(calculating_maxes(thetas, omegas))
