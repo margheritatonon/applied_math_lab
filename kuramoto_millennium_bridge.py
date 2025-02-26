@@ -8,7 +8,7 @@ D = 10    #damping
 K = 500   #stiffness
 F = 100   #amplitude of Fcos(theta_i(t))
 beta = 0.01
-n_pedestrians = 5
+n_pedestrians = 500
 
 
 time = 100
@@ -37,7 +37,7 @@ def bridge_odes(t, x1t, x2t, thetas, omegas = omegas):
     """
     x1_dot = x2t
     x2_dot = (1/M) * (-D*x2t - K*x1t + F*np.sum(np.cos(thetas)))
-    thetas_dot = omegas - beta * x2t * np.sin(thetas)
+    thetas_dot = omegas - beta * x2_dot * np.sin(thetas) #changed from x2t to x2_dot 
     return (x1_dot, x2_dot, thetas_dot)
 
 
@@ -80,6 +80,8 @@ def calculate_max_amplitude(n, time_pts = time_pts, dt = dt, x1_0 = x1_0, x2_0 =
         r_vals.append(r_obtained)
     return np.max(r_vals)
 
+second_plot = False
+
 if __name__ == "__main__":
     #now we have a list of r values for every time step.
     fig, ax = plt.subplots(1, 1)
@@ -87,18 +89,19 @@ if __name__ == "__main__":
     ax.set_title(f"Order parameter r versus time for n = {n_pedestrians}")
     ax.set_ylabel("r")
     ax.set_xlabel("Time (t)")
-    #plt.show()
+    plt.show()
     
     n_pedestrians = np.arange(1, 1002, 10) #from 1 to 500 pedestrians, sampling every 10
     print(n_pedestrians)
 
-    max_r_vals = []
-    for p in n_pedestrians:
-        max_r_vals.append(calculate_max_amplitude(p))
+    if second_plot == True:
+        max_r_vals = []
+        for p in n_pedestrians:
+            max_r_vals.append(calculate_max_amplitude(p))
 
-    figur, ax_rs = plt.subplots()
-    ax_rs.scatter(n_pedestrians, max_r_vals, label='Amplitude of sway')
-    ax_rs.set_title("Maximum r Value Versus Number of Pedestrians", size = 17)
-    ax_rs.set_xlabel("Number of Pedestrians (N)", size = 15)
-    ax_rs.set_ylabel("Max Amplitude (r)", size = 15)
-    plt.show()
+        figur, ax_rs = plt.subplots()
+        ax_rs.scatter(n_pedestrians, max_r_vals, label='Amplitude of sway')
+        ax_rs.set_title("Maximum r Value Versus Number of Pedestrians", size = 17)
+        ax_rs.set_xlabel("Number of Pedestrians (N)", size = 15)
+        ax_rs.set_ylabel("Max Amplitude (r)", size = 15)
+        plt.show()

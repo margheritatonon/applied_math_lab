@@ -18,7 +18,7 @@ omegas = np.random.normal(0, 1, n_pedestrians)  #initial frequencies of pedestri
 thetas = np.random.uniform(0, 2 * np.pi, n_pedestrians) #initial phase of pedestrians (dispersed over whole circle, not concentrated)
 
 t_add = 1000 #we will add a pedestrian every 1000 time
-time = 1000 #total time that we let the model run for
+time = 10000 #total time that we let the model run for
 dt = 0.01
 time_steps = int(time/dt)
 time_pts = np.linspace(0, time, time_steps)
