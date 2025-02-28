@@ -5,12 +5,13 @@ from scipy.fftpack import fft, fftfreq
 
 #defining all of the parameters
 M = 1
-K = 1
-F = 25
-beta = 0.01
-C = 0.01 #2*1.65 * beta #this is zeta
-N = 200 #the number of pedestrians
+K = 3
+F = 5
+beta = 0.5
+C = 0.5 #2*1.65 * beta #this is zeta
+N = 1 #the number of pedestrians
 dt = 0.01
+print(((F*beta)/(np.sqrt(K/M)*C)))
 
 sigma = 0.086 #see eckhardt paper
 omegas = np.random.normal(1, sigma, N) #sampling N omegas from a normal distribution
@@ -71,7 +72,7 @@ if __name__ == "__main__":
     plt.plot(sol.t, np.mean(xs_sol, axis=0), color='blue')  # Plot mean displacement of bridge
     plt.xlabel("Time (t)", size = 18)
     plt.ylabel("Bridge Displacement x(t)", size = 18)
-    plt.title(f"F = {F}", size=30)
+    plt.title(f"N = {N}", size=30)
     plt.show()
 
     if fast_fourier == True:
