@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 
 #defining parameters:
 M = 1000  #bridge mass
-D = 10    #damping
+C = 10    #damping
 K = 500   #stiffness
 F = 100   #amplitude of Fcos(theta_i(t))
 beta = 0.01
-n_pedestrians = 500
+n_pedestrians = 50
 
 
 time = 100
@@ -16,8 +16,8 @@ dt = 0.01
 time_steps = int(time / dt)
 time_pts = np.linspace(0, time, time_steps)
 
-
-omegas = np.random.normal(0, 1, n_pedestrians) #we are going to draw the omegas from a normal distribution, for simplicity (but this could also be Cauchy)
+sigma = 1
+omegas = np.random.normal(0, sigma, n_pedestrians) #we are going to draw the omegas from a normal distribution
 
 #initial conditions:
 x1_0 = 0
@@ -31,14 +31,14 @@ def order_parameter_r(theta):
     """
     return np.abs(np.sum(np.exp(1j * theta)) / len(theta))
 
-def bridge_odes(t, x1t, x2t, thetas, omegas = omegas):
+def bridge_odes(t, vt, xt, thetas, omegas = omegas, n_pedestrians = n_pedestrians):
     """
-    Returns x1_dot, x2_dot, thetas_dot based on x1t, x2t, and thetas.
+    Returns xdot, vdot, thetas_dot based on x, v, and thetas.
     """
-    x1_dot = x2t
-    x2_dot = (1/M) * (-D*x2t - K*x1t + F*np.sum(np.cos(thetas)))
-    thetas_dot = omegas - beta * x2_dot * np.sin(thetas) #changed from x2t to x2_dot 
-    return (x1_dot, x2_dot, thetas_dot)
+    xdot = vt
+    vdot = (1/M) * (-C*vt - K*xt + (1/n_pedestrians)*np.sum(F*np.cos(thetas)))
+    thetasdot = omegas - beta * vdot * np.cos(thetas)
+    return (xdot, vdot, thetasdot)
 
 
 r_vals_eulers = []
@@ -61,7 +61,7 @@ for t in time_pts:
 #we should observe a sharp increase of amplitude of bridge oscillatory motion above a critical number of pedestrians
 
 #first approach for amplitude: we just look at the minimum and the maximum
-def calculate_max_amplitude(n, time_pts = time_pts, dt = dt, x1_0 = x1_0, x2_0 = x2_0):
+def calculate_max_amplitude(n, time_pts = time_pts, dt = dt, x1_0 = x1_0, x2_0 = x2_0, thetas_0 = thetas_0):
     """
     Returns the maximum r value for n pedestrians (as a somewhat measure of amplitude).
     """
@@ -80,23 +80,29 @@ def calculate_max_amplitude(n, time_pts = time_pts, dt = dt, x1_0 = x1_0, x2_0 =
         r_vals.append(r_obtained)
     return np.max(r_vals)
 
+first_plot = True
 second_plot = False
 
 if __name__ == "__main__":
+    if first_plot == True:
     #now we have a list of r values for every time step.
-    fig, ax = plt.subplots(1, 1)
-    ax.plot(time_pts, np.array(r_vals_eulers))
-    ax.set_title(f"Order parameter r versus time for n = {n_pedestrians}")
-    ax.set_ylabel("r")
-    ax.set_xlabel("Time (t)")
-    plt.show()
-    
-    n_pedestrians = np.arange(1, 1002, 10) #from 1 to 500 pedestrians, sampling every 10
-    print(n_pedestrians)
+        fig, ax = plt.subplots(1, 1)
+        ax.plot(time_pts, np.array(r_vals_eulers))
+        ax.set_title(f"Order parameter r versus time for n = {n_pedestrians}")
+        ax.set_ylabel("r")
+        ax.set_xlabel("Time (t)")
+        plt.show()
+        
+        n_pedestrians = np.arange(1, 1002, 10) #from 1 to 500 pedestrians, sampling every 10
+        print(n_pedestrians)
 
     if second_plot == True:
+        n_pedestrians = np.arange(1, 1002, 10) #from 1 to 500 pedestrians, sampling every 10
+        print(n_pedestrians)
+
         max_r_vals = []
         for p in n_pedestrians:
+            thetas_0 = np.random.uniform(0, 2*np.pi, p)
             max_r_vals.append(calculate_max_amplitude(p))
 
         figur, ax_rs = plt.subplots()
