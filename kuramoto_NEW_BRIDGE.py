@@ -2,18 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 from scipy.fftpack import fft, fftfreq
+from scipy.stats import norm
+
 
 #defining all of the parameters
 M = 1
-K = 3
-F = 5
-beta = 0.5
-C = 0.5 #2*1.65 * beta #this is zeta
-N = 1 #the number of pedestrians
+K = 2
+F = 25
+beta = 0.1
+C = 0.01 #2*1.65 * beta #this is zeta
+N = 50 #the number of pedestrians
 dt = 0.01
-print(((F*beta)/(np.sqrt(K/M)*C)))
 
-sigma = 0.086 #see eckhardt paper
+sigma = 0.086 #see eckhardt paper 
+
 omegas = np.random.normal(1, sigma, N) #sampling N omegas from a normal distribution
 
 thetas_0 = np.random.uniform(0, 2*np.pi, N) #initializing the thetas
@@ -82,7 +84,7 @@ if __name__ == "__main__":
         fft_values = np.abs(fft(y_values))  # Compute FFT
 
         plt.figure(figsize=(8, 4))
-        plt.plot(freqs[:N_points // 50], fft_values[:N_points // 50])
+        plt.plot(freqs[:N_points // 2], fft_values[:N_points // 2])
         plt.xlabel("Frequency")
         plt.ylabel("Magnitude")
         plt.title(f"Fourier Spectrum of Bridge Motion (M={M})")
