@@ -4,7 +4,7 @@ from scipy.integrate import solve_ivp
 from scipy.fftpack import fft, fftfreq
 
 #defining all of the parameters
-M = 2.5
+M = 1
 K = 1
 F = 25
 beta = 0.01
@@ -46,7 +46,7 @@ fast_fourier = False
 if __name__ == "__main__":
     #evolving the system over time
     initial_condition = np.concatenate([x, v, thetas_0])
-    t_final = 3000
+    t_final = 160
     t_eval = np.arange(0, t_final, dt)
     print(t_eval.shape)
     sol = solve_ivp(bridge_odes, (0, t_final), initial_condition, t_eval=t_eval)
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     plt.plot(sol.t, np.mean(xs_sol, axis=0), color='blue')  # Plot mean displacement of bridge
     plt.xlabel("Time (t)", size = 18)
     plt.ylabel("Bridge Displacement x(t)", size = 18)
-    plt.title(f"M = {M}", size=30)
+    plt.title(f"F = {F}", size=30)
     plt.show()
 
     if fast_fourier == True:
