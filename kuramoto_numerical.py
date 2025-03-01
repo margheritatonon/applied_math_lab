@@ -45,8 +45,6 @@ fig, axes = plt.subplots(5, 4, figsize = (8,8))
 axes = axes.flatten()
 
 
-
-
 theta, omega = initialize_oscillators(n, sigma, conc, distribution=distr)
 print(f"theta.shape = {theta.shape}")
 print(f"theta.flatten().shape = {theta.flatten().shape}")
@@ -155,11 +153,15 @@ ax_bifurcation.errorbar(kvalues, np.array(means), yerr=[stds, stds], label = "Em
 ax_bifurcation.set_title(f"{distr.capitalize()} Distribution with n = {n}", size = 40)
 ax_bifurcation.set_xlabel("k", size = 30)
 ax_bifurcation.set_ylabel("r", size = 30)
+ax_bifurcation.axvline(k_critical, color='gray', linestyle='--', linewidth=2, label = "k_critical")
+#plt.legend(fontsize=30, loc = "lower right")
+plt.xticks(fontsize = 20)
+plt.yticks(fontsize = 20)
 
 #we now need to identify the approximate value of kc and compare it with the theoretical value
 
 
 plt.tight_layout()
 plt.show()
-#plt.savefig(f"kuramoto_{distr}_{n}_rvsk.png")
+#plt.savefig(f"A_NEW_kuramoto_{distr}_{n}_rvsk.png")
 
