@@ -91,7 +91,7 @@ print(stds)
 
 
 
-#if we were to solve the function numerically, we have the 1 = integral, so integral - 1 = 0 and we can use newtons method
+#if we were to solve the function numerically, we have the 1 = integral, so integral - 1 = 0 and we can use quadrature
 
 def integral(theta, k, r, sigma = sigma, dist = distr):
     return k * (((np.cos(theta))**2) *  prob_distribution(k*r*np.sin(theta), sigma = sigma, dist = distr))
@@ -108,15 +108,19 @@ def root_find(r, k, sigma = sigma, d = distr):
 #now we do this for all values of k
 theoretical_r_values = []
 for ks in kvalues:
-    try:
-        r_solution = brentq(root_find, 0, 1, args=(ks, sigma, distr)) #r is between 0 and 1, always
-        theoretical_r_values.append(r_solution)
-    except:
+    if ks < k_critical:
         theoretical_r_values.append(0)
+    else:
+        try:
+            r_solution = brentq(root_find, 0, 1, args=(ks, sigma, distr)) #r is between 0 and 1, always
+            theoretical_r_values.append(r_solution)
+        except:
+            theoretical_r_values.append(0)
 
-print(f"r_values = {theoretical_r_values}")
+#print(f"theoretical_r_values = {theoretical_r_values}")
 
-#this is solving it analytically - but we plot everything below using the numerical integration
+#this is solving it analytically - but we plot everything below using the numerical integration.
+#note: the analytical solution looks a lot different when plotted than the numerical integration. but this is because the analytical solution holds near onset, whereas the integral solved numerically holds over a larger interval.
 def normal_second_derivative(omega, sigma:float = sigma): 
     return (((omega**2)/(sigma**2)) - 1) * (1/(np.sqrt(2*np.pi*sigma**6))) * np.exp(-(omega**2)/(2*sigma**2))
 if distr == "cauchy":
@@ -142,7 +146,10 @@ elif distr == "normal":
             r = np.minimum(r, 1)
             to_plot.append(r)
     arr_to_plot = np.array(to_plot)
+
+
 theoretical_rs_from_integration = np.array(theoretical_r_values)
+
 
 #plotting:
 fig, ax_bifurcation = plt.subplots(1, 1, figsize=(12, 6))
@@ -158,7 +165,6 @@ ax_bifurcation.axvline(k_critical, color='gray', linestyle='--', linewidth=2, la
 plt.xticks(fontsize = 20)
 plt.yticks(fontsize = 20)
 
-#we now need to identify the approximate value of kc and compare it with the theoretical value
 
 
 plt.tight_layout()
