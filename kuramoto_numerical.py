@@ -157,12 +157,12 @@ ax_bifurcation.plot(kvalues, theoretical_rs_from_integration, label = "Theoretic
 #ax_bifurcation.scatter(kvalues, np.array(means), label = "Empirical", color = "red")
 ax_bifurcation.errorbar(kvalues, np.array(means), yerr=[stds, stds], label = "Empirical", color = "red", fmt = "o")
 #ax_bifurcation.set_title(f"Empirical and Theoretical r Versus k for {distr.capitalize()} Distribution")
-ax_bifurcation.set_title(f"{distr.capitalize()} Distribution with n = {n}", size = 40)
+ax_bifurcation.set_title(f"{distr.capitalize()} Distribution with N = {n}", size = 40)
 ax_bifurcation.set_xlabel("k", size = 30)
 ax_bifurcation.set_ylabel("r", size = 30)
 ax_bifurcation.axvline(k_critical, color='gray', linestyle='--', linewidth=2, label = "k_critical")
 #plt.legend(fontsize=30, loc = "lower right")
-plt.xticks(fontsize = 20)
+plt.xticks(fontsize = 30)
 plt.yticks(fontsize = 20)
 
 
