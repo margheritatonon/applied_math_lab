@@ -3,14 +3,15 @@ import numpy as np
 import matplotlib.animation as animation
 from matplotlib.backend_bases import MouseEvent
 from matplotlib.widgets import Slider
+from scipy.spatial.distance import pdist, squareform
 
 
 #defining the parameters
-N = 50
-L = 20
+N = 50 #this needs to be 300
+L = 25
 density = N / (L**2)
-v = 5 #speed
-eta = 0.5 #noise amplitude
+v = 0.3 #speed
+eta = 0.05 #noise amplitude
 r = 5 #radius of neighbors
 
 dt = 0.01
@@ -35,13 +36,43 @@ def order_parameter_va(orientations):
     va = np.sqrt((np.mean(v_x))**2 + (np.mean(v_y))**2)
     return va 
 
-def update(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orientations, dt=dt, r = r, eta = eta):
+def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orientations, dt=dt, r = r, eta = eta):
     #distance matrix - N by N
     #we want to compute the distance between each point to each point
     #so we have all of the points in pos_0 and we want their difference to each. so then each row i is the distance from pt i to all other points
     #use scipy.spatial.distance
     #and the neighbords is where the distance is less than the radius
-    pass
+
+    all_pos = []
+    all_os = []
+    for k in range(num_iters):
+        dist = pdist(pos_0.T)
+        print(f"first dist shape = {dist.shape}")
+        dist = squareform(dist)
+        print(f"seocnd dist shape = {dist.shape}")
+        neighbors = dist <= r
+
+        print(f"dist shape = {dist.shape}")
+        print(f"neighbors shape = {neighbors.shape}")
+        print(neighbors)
+        print(f"o0 shape = {o_0.shape}")
+        
+        mean_angle = o_0 @ neighbors / np.sum(neighbors, axis = 1)
+
+        noise = np.random.uniform(-eta, eta, len(o_0))
+
+        o_0 = mean_angle + noise
+        o_0 = np.mod(o_0, 2 * np.pi)
+
+        vel = v * np.array([np.cos(o_0), np.sin(o_0)])
+        pos_0 = pos_0 + dt * vel
+        #periodic boundary
+        pos_0 = np.mod(pos_0, L)
+
+        all_pos.append(pos_0)
+        all_os.append(o_0)
+
+    return np.array(all_pos), np.array(all_os)
 
 
 def update_for(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orientations, dt = dt, r = r, eta = eta, L = L):
@@ -103,6 +134,9 @@ def get_coords(num_iters):
     return x, y
 
 def run_simulation(num_frames, L = L, N = N, v = v):
+    """
+    Plots the animation of the boids on an L times L square
+    """
     #figure, axis
     fig, ax = plt.subplots(1, 1)
     plt.subplots_adjust(bottom=0.25)
@@ -112,11 +146,14 @@ def run_simulation(num_frames, L = L, N = N, v = v):
 
     #slider for the velocity
     v0_min = 0
-    v0_max = 30
-    v0_step = 0.5
+    v0_max = 1
+    v0_step = 0.01
     slider_v0 = plt.Slider(ax_eta, "Velocity", v0_min, v0_max, valinit=v, valstep=v0_step)
     
     def update_slider_v0(_):
+        """
+        Function that connects slider value with animation
+        """
         nonlocal v, pos, ors, ani
     	# Pause animation
         ani.event_source.stop()
@@ -159,15 +196,16 @@ def run_simulation(num_frames, L = L, N = N, v = v):
     plt.show()
 
 
+#control what plots are run
 position = False
 etavsorder = False
 animatio = True
 
 if __name__ == "__main__":
 
-    #position plot
+    #position plot - not sure this actually works well
     if position == True:
-        iters = 10
+        iters = 5
         x, y = get_coords(iters)
         plt.scatter(np.array(x), np.array(y))
         plt.title(f"Birds after {iters} iterations")
@@ -180,12 +218,13 @@ if __name__ == "__main__":
         etavals = np.linspace(0, 5, 20)
         orders = []
         for et in etavals:
-            pos, orientation = update(100, v = v, eta = et)
+            pos, orientation = update_for(100, v = v, eta = et)
             order = order_parameter_va(orientation)
             orders.append(order)
         plt.scatter(etavals, np.array(orders))
         plt.xlabel("eta")
         plt.ylabel("order parameter")
+        plt.title("Noise (eta) Versus Order Parameter")
         plt.show()
     
     #animation
