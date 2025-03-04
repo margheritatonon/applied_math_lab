@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.animation as animation
 from matplotlib.backend_bases import MouseEvent
+from matplotlib.widgets import Slider
+
 
 #defining the parameters
 N = 100
@@ -90,10 +92,7 @@ def update_for(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orient
         all_positions.append(pos_0)
         all_orientations.append(o_0)
 
-    print(all_positions)
     return np.array(all_positions), np.array(all_orientations)
-
-print(update_for(10)[0].shape)
 
 def get_coords(num_iters):
     """
@@ -106,6 +105,29 @@ def get_coords(num_iters):
 def run_simulation(num_frames, L = L, N = N, v = v):
     #figure, axis
     fig, ax = plt.subplots(1, 1)
+    plt.subplots_adjust(bottom=0.25)
+
+    #adding a slider
+    ax_eta = plt.axes([0.2, 0.05, 0.65, 0.03])
+
+    #slider for the velocity
+    v0_min = 0
+    v0_max = 10
+    v0 = v
+    v0_step = 0.5
+    slider_v0 = plt.Slider(ax_eta, "Velocity", v0_min, v0_max, valinit=v0, valstep=v0_step)
+    def update_slider_v0(_):
+        nonlocal v0, pos, ors, ani
+    	# Pause animation
+        ani.event_source.stop()
+    	# Update parameters with sliders
+        v0 = slider_v0.val
+        pos, ors = update_for(num_frames, v=v0)
+    	# Reinitialize the animation
+        ani = animation.FuncAnimation(fig, update_q, frames=pos.shape[0], interval=100, blit=True)
+        ani.event_source.start()
+
+    slider_v0.on_changed(update_slider_v0)
 
     x_arr = np.linspace(0, L, N) 
     y_arr = np.linspace(0, L, N)
