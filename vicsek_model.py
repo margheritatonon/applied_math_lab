@@ -112,13 +112,12 @@ def run_simulation(num_frames, L = L, N = N, v = v):
 
     #slider for the velocity
     v0_min = 0
-    v0_max = 20
-    v0 = v
+    v0_max = 30
     v0_step = 0.5
-    slider_v0 = plt.Slider(ax_eta, "Velocity", v0_min, v0_max, valinit=v0, valstep=v0_step)
+    slider_v0 = plt.Slider(ax_eta, "Velocity", v0_min, v0_max, valinit=v, valstep=v0_step)
     
     def update_slider_v0(_):
-        nonlocal v0, pos, ors, ani
+        nonlocal v, pos, ors, ani
     	# Pause animation
         ani.event_source.stop()
     	# Update parameters with sliders
