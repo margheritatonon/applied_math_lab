@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.animation as animation
+from matplotlib.backend_bases import MouseEvent
 
 #defining the parameters
 N = 100
@@ -36,8 +37,9 @@ def update(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orientatio
     #distance matrix - N by N
     #we want to compute the distance between each point to each point
     #so we have all of the points in pos_0 and we want their difference to each. so then each row i is the distance from pt i to all other points
-    mesh = np.meshgrid(pos_0, pos_0)
-    np.linalg.norm(mesh, axis = 1)
+    #use scipy.spatial.distance
+    #and the neighbords is where the distance is less than the radius
+    pass
 
 
 def update_for(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orientations, dt = dt, r = r, eta = eta, L = L):
@@ -102,9 +104,6 @@ def get_coords(num_iters):
     return x, y
 
 def run_simulation(num_frames, L = L, N = N, v = v):
-    #initializing
-    initial_positions, initial_velocities, initial_orientations = initialize_things(L, N, v)
-
     #figure, axis
     fig, ax = plt.subplots(1, 1)
 
@@ -140,6 +139,7 @@ def run_simulation(num_frames, L = L, N = N, v = v):
 position = False
 etavsorder = False
 animatio = True
+
 if __name__ == "__main__":
 
     #position plot
