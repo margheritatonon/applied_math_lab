@@ -6,7 +6,7 @@ from matplotlib.widgets import Slider
 
 
 #defining the parameters
-N = 100
+N = 50
 L = 20
 density = N / (L**2)
 v = 5 #speed
@@ -112,10 +112,11 @@ def run_simulation(num_frames, L = L, N = N, v = v):
 
     #slider for the velocity
     v0_min = 0
-    v0_max = 10
+    v0_max = 20
     v0 = v
     v0_step = 0.5
     slider_v0 = plt.Slider(ax_eta, "Velocity", v0_min, v0_max, valinit=v0, valstep=v0_step)
+    
     def update_slider_v0(_):
         nonlocal v0, pos, ors, ani
     	# Pause animation
@@ -124,7 +125,8 @@ def run_simulation(num_frames, L = L, N = N, v = v):
         v0 = slider_v0.val
         pos, ors = update_for(num_frames, v=v0)
     	# Reinitialize the animation
-        ani = animation.FuncAnimation(fig, update_q, frames=pos.shape[0], interval=100, blit=True)
+        #ani = animation.FuncAnimation(fig, update_q, frames=pos.shape[0], interval=100, blit=True)
+        plot_q.set_UVC(v0 * np.cos(ors[0]), v0 * np.sin(ors[0]))
         ani.event_source.start()
 
     slider_v0.on_changed(update_slider_v0)
