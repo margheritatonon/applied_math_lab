@@ -11,10 +11,10 @@ N = 300 #this needs to be 300
 L = 25
 density = N / (L**2)
 v = 0.3 #speed
-eta = 0.05 #noise amplitude
+eta = 0.1 #noise amplitude
 r = 1 #radius of neighbors
 
-dt = 0.01
+dt = 1
 
 def initialize_things(L = L, N = N, v = v):
     """
@@ -37,12 +37,9 @@ def order_parameter_va(orientations):
     return va 
 
 def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orientations, dt=dt, r = r, eta = eta):
-    #distance matrix - N by N
-    #we want to compute the distance between each point to each point
-    #so we have all of the points in pos_0 and we want their difference to each. so then each row i is the distance from pt i to all other points
-    #use scipy.spatial.distance
-    #and the neighbords is where the distance is less than the radius
-
+    """
+    Defines an (efficient) update rule and returns the positions and orientations at every iteration
+    """
     all_pos = []
     all_os = []
     for k in range(num_iters):
@@ -77,7 +74,8 @@ def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_
 
 def update_for(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orientations, dt = dt, r = r, eta = eta, L = L):
     """
-    Defines the update rule for the position and orientation of the birds.
+    Defines the update rule for the position and orientation of the birds. 
+    Returns lists of the positions and orientations at every iteration. 
     """
     pos_0 = pos_0.copy()
     o_0 = o_0.copy()
@@ -135,7 +133,7 @@ def get_coords(num_iters):
 
 def run_simulation(num_frames, L = L, N = N, v = v):
     """
-    Plots the animation of the boids on an L times L square
+    Plots the animation of the boids on an L times L square for num_frames frames
     """
     #figure, axis
     fig, ax = plt.subplots(1, 1)
