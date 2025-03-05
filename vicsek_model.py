@@ -44,15 +44,15 @@ def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_
     all_os = []
     for k in range(num_iters):
         dist = pdist(pos_0)
-        print(f"first dist shape = {dist.shape}")
+        #print(f"first dist shape = {dist.shape}")
         dist = squareform(dist)
-        print(f"seocnd dist shape = {dist.shape}")
+        #print(f"seocnd dist shape = {dist.shape}")
         neighbors = dist <= r
 
-        print(f"dist shape = {dist.shape}")
-        print(f"neighbors shape = {neighbors.shape}")
-        print(neighbors)
-        print(f"o0 shape = {o_0.shape}")
+        #print(f"dist shape = {dist.shape}")
+        #print(f"neighbors shape = {neighbors.shape}")
+        #print(neighbors)
+        #print(f"o0 shape = {o_0.shape}")
         
         mean_angle = neighbors @ o_0 / np.sum(neighbors, axis = 1)
 
@@ -191,7 +191,7 @@ def run_simulation(num_frames, L = L, N = N, v = v):
     plot_q = ax.quiver(x_arr, y_arr, np.cos(vs), np.sin(vs), angles = "xy")
 
     pos, ors = update_efficient(num_frames)
-    print(f"ors.shape = {ors.shape}")
+    #print(f"ors.shape = {ors.shape}")
 
     """def update_an(frame):
         plot_an.set_xdata(pos[frame, :, 0])
@@ -244,6 +244,6 @@ if __name__ == "__main__":
     
     #animation
     if animatio == True:
-        num_frames = 100
+        num_frames = 1000 #there are some glitches in the animation when the number of frames finishes and the system restarts
         run_simulation(num_frames)
         
