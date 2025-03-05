@@ -153,6 +153,13 @@ def run_simulation(num_frames, L = L, N = N, v = v):
     eta_step = 0.1
     slider_eta = plt.Slider(ax_eta, "Noise Amplitude", eta_min, eta_max, valinit=eta, valstep=eta_step)
 
+    #slider for r
+    ax_r = plt.axes([0.2, 0.15, 0.65, 0.03])
+    r_min = 0
+    r_max = L / 4
+    r_step = 0.1
+    slider_r = plt.Slider(ax_r, label = "Radius", valmin=r_min, valmax=r_max, valinit=r, valstep=r_step)
+
 
     def update_sliders(_):
         """
@@ -164,7 +171,8 @@ def run_simulation(num_frames, L = L, N = N, v = v):
     	# Update parameters with sliders
         v0 = slider_v0.val
         et = slider_eta.val
-        pos, ors = update_efficient(num_frames, v=v0, eta = et)
+        rad = slider_r.val
+        pos, ors = update_efficient(num_frames, v=v0, eta = et, r=rad)
     	# Reinitialize the animation
         #ani = animation.FuncAnimation(fig, update_q, frames=pos.shape[0], interval=100, blit=True)
         plot_q.set_UVC(v0 * np.cos(ors[0]), v0 * np.sin(ors[0]))
@@ -172,6 +180,7 @@ def run_simulation(num_frames, L = L, N = N, v = v):
 
     slider_v0.on_changed(update_sliders)
     slider_eta.on_changed(update_sliders)
+    slider_r.on_changed(update_sliders)
 
     x_arr = np.linspace(0, L, N) 
     y_arr = np.linspace(0, L, N)
