@@ -7,12 +7,12 @@ from scipy.spatial.distance import pdist, squareform
 
 
 #defining the parameters
-N = 50 #this needs to be 300
+N = 300 #this needs to be 300
 L = 25
 density = N / (L**2)
 v = 0.3 #speed
 eta = 0.05 #noise amplitude
-r = 5 #radius of neighbors
+r = 1 #radius of neighbors
 
 dt = 0.01
 
@@ -46,7 +46,7 @@ def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_
     all_pos = []
     all_os = []
     for k in range(num_iters):
-        dist = pdist(pos_0.T)
+        dist = pdist(pos_0)
         print(f"first dist shape = {dist.shape}")
         dist = squareform(dist)
         print(f"seocnd dist shape = {dist.shape}")
@@ -57,7 +57,7 @@ def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_
         print(neighbors)
         print(f"o0 shape = {o_0.shape}")
         
-        mean_angle = o_0 @ neighbors / np.sum(neighbors, axis = 1)
+        mean_angle = neighbors @ o_0 / np.sum(neighbors, axis = 1)
 
         noise = np.random.uniform(-eta, eta, len(o_0))
 
@@ -65,7 +65,7 @@ def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_
         o_0 = np.mod(o_0, 2 * np.pi)
 
         vel = v * np.array([np.cos(o_0), np.sin(o_0)])
-        pos_0 = pos_0 + dt * vel
+        pos_0 = pos_0 + dt * vel.T
         #periodic boundary
         pos_0 = np.mod(pos_0, L)
 
@@ -129,7 +129,7 @@ def get_coords(num_iters):
     """
     Returns the x and y coordinates of each of the birds after num_iters iterations
     """
-    pos, o0 = update_for(num_iters)
+    pos, o0 = update_efficient(num_iters)
     x, y = pos[:, 0], pos[:, 1]
     return x, y
 
@@ -159,7 +159,7 @@ def run_simulation(num_frames, L = L, N = N, v = v):
         ani.event_source.stop()
     	# Update parameters with sliders
         v0 = slider_v0.val
-        pos, ors = update_for(num_frames, v=v0)
+        pos, ors = update_efficient(num_frames, v=v0)
     	# Reinitialize the animation
         #ani = animation.FuncAnimation(fig, update_q, frames=pos.shape[0], interval=100, blit=True)
         plot_q.set_UVC(v0 * np.cos(ors[0]), v0 * np.sin(ors[0]))
@@ -175,7 +175,7 @@ def run_simulation(num_frames, L = L, N = N, v = v):
     #(plot_an,) = ax.plot(x_arr, y_arr, marker = "o", linestyle="None") 
     plot_q = ax.quiver(x_arr, y_arr, np.cos(vs), np.sin(vs), angles = "xy")
 
-    pos, ors = update_for(num_frames)
+    pos, ors = update_efficient(num_frames)
     print(f"ors.shape = {ors.shape}")
 
     """def update_an(frame):
@@ -218,7 +218,7 @@ if __name__ == "__main__":
         etavals = np.linspace(0, 5, 20)
         orders = []
         for et in etavals:
-            pos, orientation = update_for(100, v = v, eta = et)
+            pos, orientation = update_efficient(100, v = v, eta = et)
             order = order_parameter_va(orientation)
             orders.append(order)
         plt.scatter(etavals, np.array(orders))
