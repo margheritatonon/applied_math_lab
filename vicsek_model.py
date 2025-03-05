@@ -139,16 +139,22 @@ def run_simulation(num_frames, L = L, N = N, v = v):
     fig, ax = plt.subplots(1, 1)
     plt.subplots_adjust(bottom=0.25)
 
-    #adding a slider
-    ax_eta = plt.axes([0.2, 0.05, 0.65, 0.03])
-
-    #slider for the velocity
+    #adding a slider for velocity
+    ax_vel = plt.axes([0.2, 0.05, 0.65, 0.03]) 
     v0_min = 0
     v0_max = 1
     v0_step = 0.01
-    slider_v0 = plt.Slider(ax_eta, "Velocity", v0_min, v0_max, valinit=v, valstep=v0_step)
-    
-    def update_slider_v0(_):
+    slider_v0 = plt.Slider(ax_vel, "Velocity", v0_min, v0_max, valinit=v, valstep=v0_step)
+
+    #slider for eta
+    ax_eta = plt.axes([0.2, 0.1, 0.65, 0.03]) #for noise amplitude eta
+    eta_min = 0
+    eta_max = 1
+    eta_step = 0.1
+    slider_eta = plt.Slider(ax_eta, "Noise Amplitude", eta_min, eta_max, valinit=eta, valstep=eta_step)
+
+
+    def update_sliders(_):
         """
         Function that connects slider value with animation
         """
@@ -157,13 +163,15 @@ def run_simulation(num_frames, L = L, N = N, v = v):
         ani.event_source.stop()
     	# Update parameters with sliders
         v0 = slider_v0.val
-        pos, ors = update_efficient(num_frames, v=v0)
+        et = slider_eta.val
+        pos, ors = update_efficient(num_frames, v=v0, eta = et)
     	# Reinitialize the animation
         #ani = animation.FuncAnimation(fig, update_q, frames=pos.shape[0], interval=100, blit=True)
         plot_q.set_UVC(v0 * np.cos(ors[0]), v0 * np.sin(ors[0]))
         ani.event_source.start()
 
-    slider_v0.on_changed(update_slider_v0)
+    slider_v0.on_changed(update_sliders)
+    slider_eta.on_changed(update_sliders)
 
     x_arr = np.linspace(0, L, N) 
     y_arr = np.linspace(0, L, N)
