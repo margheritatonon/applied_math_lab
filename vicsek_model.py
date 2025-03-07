@@ -7,7 +7,7 @@ from scipy.spatial.distance import pdist, squareform
 
 
 #defining the parameters
-N = 300 #this needs to be 300
+N = 300 
 L = 25
 density = N / (L**2)
 v = 0.3 #speed
@@ -21,7 +21,7 @@ def initialize_things(L = L, N = N, v = v):
     initializes positions, velocities, and orientations
     """
     initial_positions = np.random.uniform(0, L, (N, 2))
-    initial_velocities = np.ones((N, 2)) * v
+    initial_velocities = np.ones((N, 2)) * v #this is not really used, because the initial velocities is treated as a constant
     initial_orientations = np.random.normal(0, 2*np.pi, N)
     return initial_positions, initial_velocities, initial_orientations
 
@@ -38,7 +38,7 @@ def order_parameter_va(orientations):
 
 def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orientations, dt=dt, r = r, eta = eta):
     """
-    Defines an (efficient) update rule and returns the positions and orientations at every iteration
+    Defines an (efficient) update rule and returns the positions and orientations at every iteration in num_iters
     """
     all_pos = []
     all_os = []
@@ -49,10 +49,6 @@ def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_
         #print(f"seocnd dist shape = {dist.shape}")
         neighbors = dist <= r
 
-        #print(f"dist shape = {dist.shape}")
-        #print(f"neighbors shape = {neighbors.shape}")
-        #print(neighbors)
-        #print(f"o0 shape = {o_0.shape}")
         
         mean_angle = neighbors @ o_0 / np.sum(neighbors, axis = 1)
 
@@ -71,10 +67,10 @@ def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_
 
     return np.array(all_pos), np.array(all_os)
 
-
+#this function is not used for the following computations
 def update_for(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orientations, dt = dt, r = r, eta = eta, L = L):
     """
-    Defines the update rule for the position and orientation of the birds. 
+    Defines the (less efficient) update rule for the position and orientation of the birds. 
     Returns lists of the positions and orientations at every iteration. 
     """
     pos_0 = pos_0.copy()
@@ -133,7 +129,7 @@ def get_coords(num_iters):
 
 def run_simulation(num_frames, L = L, N = N, v = v):
     """
-    Plots the animation of the boids on an L times L square for num_frames frames
+    Plots the animation of the boids on an L times L square for num_frames frames, with corresponding sliders
     """
     #figure, axis
     fig, ax = plt.subplots(1, 1)
@@ -187,16 +183,17 @@ def run_simulation(num_frames, L = L, N = N, v = v):
     vs = np.zeros(N)
 
     #not quiver, just points
-    #(plot_an,) = ax.plot(x_arr, y_arr, marker = "o", linestyle="None") 
+    #(plot_an,) = ax.plot(x_arr, y_arr, marker = "o", linestyle="None")
+
+    # quiver 
     plot_q = ax.quiver(x_arr, y_arr, np.cos(vs), np.sin(vs), angles = "xy")
 
     pos, ors = update_efficient(num_frames)
-    #print(f"ors.shape = {ors.shape}")
 
-    """def update_an(frame):
-        plot_an.set_xdata(pos[frame, :, 0])
-        plot_an.set_ydata(pos[frame, :, 1]) 
-        return plot_an,"""
+    #def update_an(frame):
+        #plot_an.set_xdata(pos[frame, :, 0])
+        #plot_an.set_ydata(pos[frame, :, 1]) 
+        #return plot_an,
 
     def update_q(frame):
         plot_q.set_offsets(pos[frame, :, :])
@@ -212,31 +209,21 @@ def run_simulation(num_frames, L = L, N = N, v = v):
 
 
 #control what plots are run
-position = False
 etavsorder = False
 animatio = True
 
 if __name__ == "__main__":
 
-    #position plot - not sure this actually works well
-    if position == True:
-        iters = 5
-        x, y = get_coords(iters)
-        plt.scatter(np.array(x), np.array(y))
-        plt.title(f"Birds after {iters} iterations")
-        plt.xlabel("x")
-        plt.ylabel("y")
-        plt.show()
-
     #eta versus order parameter plot
     if etavsorder == True:
-        etavals = np.linspace(0, 5, 20)
+        etavals = np.linspace(0, 5, 30)
         orders = []
         for et in etavals:
             pos, orientation = update_efficient(100, v = v, eta = et)
             order = order_parameter_va(orientation)
             orders.append(order)
-        plt.scatter(etavals, np.array(orders))
+        plt.scatter(etavals, np.array(orders), color = "black")
+        plt.plot(etavals, np.array(orders), color = "gray")
         plt.xlabel("eta")
         plt.ylabel("order parameter")
         plt.title("Noise (eta) Versus Order Parameter")
@@ -244,6 +231,6 @@ if __name__ == "__main__":
     
     #animation
     if animatio == True:
-        num_frames = 1000 #there are some glitches in the animation when the number of frames finishes and the system restarts
+        num_frames = 5000 #the animation will run for this number of frames. then, it restarts. 
         run_simulation(num_frames)
         
