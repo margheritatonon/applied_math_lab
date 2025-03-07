@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.animation as animation
-from matplotlib.backend_bases import MouseEvent
-from matplotlib.widgets import Slider
 from scipy.spatial.distance import pdist, squareform
 
 
@@ -11,7 +9,7 @@ N = 300
 L = 25
 density = N / (L**2)
 v = 0.3 #speed
-eta = 0.1 #noise amplitude
+eta = 0.05 #noise amplitude
 r = 1 #radius of neighbors
 
 dt = 1
@@ -146,7 +144,7 @@ def run_simulation(num_frames, L = L, N = N, v = v):
     ax_eta = plt.axes([0.2, 0.1, 0.65, 0.03]) #for noise amplitude eta
     eta_min = 0
     eta_max = 1
-    eta_step = 0.1
+    eta_step = 0.01
     slider_eta = plt.Slider(ax_eta, "Noise Amplitude", eta_min, eta_max, valinit=eta, valstep=eta_step)
 
     #slider for r
@@ -231,6 +229,6 @@ if __name__ == "__main__":
     
     #animation
     if animatio == True:
-        num_frames = 5000 #the animation will run for this number of frames. then, it restarts. 
+        num_frames = 2000 #the animation will run for this number of frames. then, it restarts. 
         run_simulation(num_frames)
         
