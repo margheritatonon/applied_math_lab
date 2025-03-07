@@ -14,7 +14,7 @@ r = 1 #radius of neighbors
 
 dt = 1
 
-def initialize_things(L = L, N = N, v = v):
+def initialize_things(L: float = L, N: float = N, v: float = v):
     """
     initializes positions, velocities, and orientations
     """
@@ -25,7 +25,7 @@ def initialize_things(L = L, N = N, v = v):
 
 initial_positions, initial_velocities, initial_orientations = initialize_things()
 
-def order_parameter_va(orientations):
+def order_parameter_va(orientations: np.ndarray):
     """
     Calculates the order parameter v_a based on the array of velocities/directions
     """
@@ -34,7 +34,7 @@ def order_parameter_va(orientations):
     va = np.sqrt((np.mean(v_x))**2 + (np.mean(v_y))**2)
     return va 
 
-def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orientations, dt=dt, r = r, eta = eta):
+def update_efficient(num_iters:int, pos_0: np.ndarray = initial_positions, v:float = v, o_0:np.ndarray = initial_orientations, dt:float=dt, r:float = r, eta:float = eta, L:float = L):
     """
     Defines an (efficient) update rule and returns the positions and orientations at every iteration in num_iters
     """
@@ -66,7 +66,7 @@ def update_efficient(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_
     return np.array(all_pos), np.array(all_os)
 
 #this function is not used for the following computations
-def update_for(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orientations, dt = dt, r = r, eta = eta, L = L):
+def update_for(num_iters:int, pos_0:np.ndarray = initial_positions, v:float = v, o_0:np.ndarray = initial_orientations, dt:float = dt, r:float = r, eta:float = eta, L:float = L):
     """
     Defines the (less efficient) update rule for the position and orientation of the birds. 
     Returns lists of the positions and orientations at every iteration. 
@@ -117,7 +117,7 @@ def update_for(num_iters, pos_0 = initial_positions, v = v, o_0 = initial_orient
 
     return np.array(all_positions), np.array(all_orientations)
 
-def get_coords(num_iters):
+def get_coords(num_iters:int):
     """
     Returns the x and y coordinates of each of the birds after num_iters iterations
     """
@@ -125,7 +125,7 @@ def get_coords(num_iters):
     x, y = pos[:, 0], pos[:, 1]
     return x, y
 
-def run_simulation(num_frames, L = L, N = N, v = v):
+def run_simulation(num_frames:int, L:float = L, N:float = N, v:float = v):
     """
     Plots the animation of the boids on an L times L square for num_frames frames, with corresponding sliders
     """
