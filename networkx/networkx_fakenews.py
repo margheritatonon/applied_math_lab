@@ -38,6 +38,7 @@ print(f"len state_dict = {len(state_dict)}")
 #updating the graph
 nx.set_node_attributes(G, state_dict, "state")
 
+#this assigns the initial state
 ignorant_nodes = []
 spreader_nodes = []
 for key, label in state_dict.items():
@@ -47,7 +48,7 @@ for key, label in state_dict.items():
         spreader_nodes.append(key)
 print(f"spreader node list = {spreader_nodes}")
 
-first_updated_plot = False
+first_updated_plot = False #this is the plot after 1 person is assigned the fake news
 if first_updated_plot == True:
     pos = nx.spring_layout(G)
     nx.draw(G, pos = pos, nodelist = ignorant_nodes, node_color = "blue", node_size = 15)
@@ -56,51 +57,76 @@ if first_updated_plot == True:
 
 
 #one iteration of the update rule:
-state = nx.get_node_attributes(G, "state")
-new_state = {}
-for node in G.nodes():
-    #ignorant nodes: for every spreader node they have in their vicinity, they have a probability beta of becoming spreaders themselves
-    if state_dict[node] == "I":
-        neighbors = list(G.neighbors(node))
-        #now we access the state_dict 
-        values = list(map(state_dict.get, neighbors))
+def update_rule(G):
+    state = nx.get_node_attributes(G, "state")
+    new_state = {}
 
-        #we apply a map to the values so we know what the probabilities we have are
-        def assign_values(my_list):
-            mapping = {"S": 1, "I": 0}
-            return list(map(mapping.get, my_list))
-        num_s = assign_values(values) #so now we have a list with all of the probabilities of becoming infected for all of the neighbors of a current node
+    def assign_values(my_list):
+        mapping = {"S": 1, "I": 0, "R":0}
+        return list(map(mapping.get, my_list))
+    
+    for node in G.nodes():
+        #ignorant nodes: for every spreader node they have in their vicinity, they have a probability beta of becoming spreaders themselves
+        if state_dict[node] == "I":
+            neighbors = list(G.neighbors(node))
+            #now we access the state_dict 
+            values = list(map(state_dict.get, neighbors))
 
-        #now we take a count of the nonzero values to see how many nonzero probabilities we have
-        count_s = sum(num_s)
-        #so then we need to do count_s times the random number between 0 and 1 in order to update the state_dict
-        for n in range(count_s):
-            if np.random.uniform(0, 1) < beta:
+            #we apply a map to the values so we know what the probabilities we have are
+            num_s = assign_values(values) #so now we have a list with all of the probabilities of becoming infected for all of the neighbors of a current node
+
+            #now we take a count of the nonzero values to see how many nonzero probabilities we have
+            #create an array with as many random numbers as susceptible neighbors and see if any of them are less than beta
+            rand_arr = np.random.uniform(0, 1, sum(num_s))
+            if np.any(rand_arr < beta):
                 new_state[node] = "S"
-                break
+
         
-        if "S" in values:
-            print(f"S is in values! we are at node {node}")
-            print(count_s)
+        #spreader node: has a probability gamma of becoming a stifler for every spreader it has in its neighborhood
+        if state_dict[node] == "S" or state_dict[node] == "R":
+            neighbors = list(G.neighbors(node))
+            values = list(map(state_dict.get, neighbors))
+            #assign values so we know what probabilities we have
+            num_s = assign_values(values)
 
-state_dict.update(new_state)
+            rand_arr = np.random.uniform(0, 1, sum(num_s))
+            if np.any(rand_arr < gamma):
+                new_state[node] = "R"
 
+    return new_state
+
+pos = nx.spring_layout(G)
+all_states = []
+num_iters = 3
+for i in range(num_iters):
+    new_state = update_rule(G)
+    all_states.append(new_state)
+    state_dict.update(new_state)
+
+#print(all_states)
+
+
+"""
 ignorant_nodes = []
 spreader_nodes = []
+rstifler_nodes = []
 for key, label in state_dict.items():
     if label == "I":
         ignorant_nodes.append(key)
-    else:
+    elif label == "S":
         spreader_nodes.append(key)
+    else:
+        rstifler_nodes.append(key)
 
 update_plot_two = True
 if update_plot_two == True:
-    pos = nx.spring_layout(G)
     nx.draw(G, pos = pos, nodelist = ignorant_nodes, node_color = "blue", node_size = 15)
     nx.draw(G, pos = pos, nodelist=spreader_nodes, node_color = "red", node_size = 15)
+    nx.draw(G, pos = pos, nodelist=rstifler_nodes, node_color = "green", node_size = 15)
+    plt.title(f"Iteration {i}")
     plt.show()
     plt.close()
 
 print(state_dict)
 value_counts = Counter(state_dict.values())
-print(value_counts)
+print(value_counts)"""
