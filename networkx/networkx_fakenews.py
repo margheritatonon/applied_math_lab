@@ -97,13 +97,53 @@ def update_rule(G):
 
 pos = nx.spring_layout(G)
 all_states = []
-num_iters = 3
+num_iters = 10
 for i in range(num_iters):
     new_state = update_rule(G)
     all_states.append(new_state)
     state_dict.update(new_state)
 
 #print(all_states)
+
+time_arr = np.linspace(0, num_iters, num_iters) #x axis
+rss = [] #y
+iss = [] #y
+sss = [] #y
+for st in all_states:
+    value_counts = Counter(st.values())
+    print(value_counts) #the other ones that are not present here are I
+    #4039 nodes in total
+
+    #making sure it doesnt cause an error if there are no R or S nodes
+    try:
+        count_r = value_counts["R"]
+    except:
+        count_r = 0
+    rss.append(count_r)
+
+    try:
+        count_s = value_counts["S"]
+    except:
+        count_s = 0
+    sss.append(count_s)
+
+    #calculaging the number of ignorant (not present in new_state)
+    total_count_rs = count_r + count_s 
+    count_i = 4039 - total_count_rs
+    iss.append(count_i)
+
+#now we can plot the graph of these versus iterations
+static = True
+if static == True:
+    fig, ax = plt.subplots()
+    ax.plot(time_arr, np.array(iss), label = "I", color = "blue")
+    ax.plot(time_arr, np.array(rss), label = "R", color = "green")
+    ax.plot(time_arr, np.array(sss), label = "S", color = "red")
+    ax.legend()
+    ax.set_title("Ignorant (I), Spreader (S), and Stifler (R) Evolution")
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Population")
+    plt.show()
 
 
 """
