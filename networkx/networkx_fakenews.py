@@ -3,6 +3,7 @@ import networkx as nx
 import pandas as pd
 import numpy as np
 from collections import Counter
+import matplotlib.animation as animation
 
 facebook = pd.read_csv("/Users/margheritatonon/applied_math_lab/networkx/facebook_combined.txt.gz", 
                        compression = "gzip", sep = " ", names = ["start_node", "end_node"])
@@ -18,6 +19,7 @@ if plot_initial == True:
 
 beta = 0.5 #"infection" rate
 gamma = 0.3 #"recovery" rate
+
 
 #giving ignorant to every node
 state = []
@@ -138,7 +140,7 @@ for st in all_states:
     iss.append(count_i)
 
 #now we can plot the graph of these versus iterations
-static = True
+static = False
 if static == True:
     fig, ax = plt.subplots()
     ax.plot(time_arr, np.array(iss), label = "I", color = "blue")
@@ -150,6 +152,38 @@ if static == True:
     ax.set_ylabel("Population")
     plt.show()
 
+
+#creating subplots:
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+(plot_graph,) = ax1.plot([], []) #for the actual graph
+(plot_overtime,) = ax2.plot([], []) #for the plot ov SIR over time
+
+#for the animation:
+#need to at every time step save the network state but also the number of S, I, R for the other plot
+
+def animate_SIR(i, x, ignorant, spreader, stifler): #so i need something that returns ignorant, spreader, stifler numbers in total, like over the entire simulation life
+    plot_overtime.set_data(x[:i], ignorant[:i], color = "blue", label = "Ignorant") #x needs to be the time array, y needs to be the SIR... but we have 3 of them so idk how
+    plot_overtime.set_data(x[:i], spreader[:i], color = "red", label = "Spreader")
+    plot_overtime.set_data(x[:i], stifler[:i], color = "green", label = "Stifler")
+    return plot_overtime,
+
+
+ani1 = animation.FuncAnimation(fig, animate_SIR, fargs=(time_arr, iss, sss, rss), interval=70, blit=False)
+ax1.legend()
+ax1.set_title("Ignorant (I), Spreader (S), and Stifler (R) Evolution")
+ax1.set_xlabel("Time")
+ax1.set_ylabel("Population")
+
+#ax1.plot(xx_nullcline_pts_sorted, xy_nullcline_pts_sorted, color = "red", label = "dx/dt nullcline", ls = ":")
+#ax1.plot(yx_nullcline_pts_sorted, yy_nullcline_pts_sorted, color = "green", label = "dy/dt nullcine", ls = ":")
+#ax1.scatter(fsolve_res[0], fsolve_res[1], color = "black", label = "fixed point")
+#ax1.set_xlabel("x")
+#ax1.set_ylabel("y")
+#ax1.legend()
+#ax1.set_title("Van der Pol Phase Plane")
+
+plt.tight_layout()
+plt.show()
 
 """
 ignorant_nodes = []
