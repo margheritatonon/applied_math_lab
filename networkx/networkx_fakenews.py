@@ -92,6 +92,11 @@ def update_rule(G):
             rand_arr = np.random.uniform(0, 1, sum(num_s))
             if np.any(rand_arr < gamma):
                 new_state[node] = "R"
+            else:
+                if state_dict[node] == "S":
+                    new_state[node] = "S"
+                else:
+                    new_state[node] = "R"
 
     return new_state
 
