@@ -147,7 +147,7 @@ def extract_sir(all_states):
             count_s = 0
         sss.append(count_s)
 
-        #calculaging the number of ignorant (not present in new_state)
+        #calculating the number of ignorant (not present in new_state)
         total_count_rs = count_r + count_s 
         count_i = 4039 - total_count_rs
         iss.append(count_i)
