@@ -110,7 +110,7 @@ def update_rule(G):
 
     return new_state
 
-num_iters = 20
+num_iters = 5
 
 def all_iters(num_iters):
     """
@@ -127,14 +127,15 @@ def all_iters(num_iters):
 
 time_arr = np.linspace(0, num_iters, num_iters) #x axis
 
-def extract_sir():
+all_states = all_iters(num_iters)
+
+def extract_sir(all_states):
     """
     Returns a tuple of the number of ignorant, spreader, and stifler nodes for all states for all iterations
     """
     rss = [] #y
     iss = [] #y
     sss = [] #y
-    all_states = all_iters(num_iters)
     for st in all_states:
         value_counts = Counter(st.values())
         print(value_counts) #the other ones that are not present here are I
@@ -159,7 +160,7 @@ def extract_sir():
         iss.append(count_i)
     return rss, iss, sss 
 
-rss, iss, sss = extract_sir()
+rss, iss, sss = extract_sir(all_states)
 
 #now we can plot the graph of these versus iterations
 static = False
@@ -182,9 +183,33 @@ line_I, = ax2.plot([], [], color="blue", label="Ignorant")
 line_S, = ax2.plot([], [], color="red", label="Spreader")
 line_R, = ax2.plot([], [], color="green", label="Stifler") #for the plot ov SIR over time
 
-#for the animation:
-#need to at every time step save the network state but also the number of S, I, R for the other plot
 
+#NETWORK ANIMATION:
+#defining the graph
+pos = nx.spring_layout(G)
+
+#we care about all_iters --> return a list of all of the node numbers and their states for every iteration
+#defining the animation function
+#all_states = all_iters(num_iters) --> we already have this defined above
+
+def animate_graph(i, G, pos):
+    curr_state = all_states[i] #this is the node number and the state it is
+
+    #need to extract the S, I, R nodes from this dictionary
+    i_list = list(map(lambda keyval: keyval[0], filter(lambda keyval: keyval[1] == "I", curr_state.items())))
+    s_list = list(map(lambda keyval: keyval[0], filter(lambda keyval: keyval[1] == "S", curr_state.items())))
+    r_list = list(map(lambda keyval: keyval[0], filter(lambda keyval: keyval[1] == "R", curr_state.items())))
+    
+    #drawing
+    nx.draw(G, pos = pos, nodelist = i_list, node_color = "blue", node_size = 15, ax=ax1)
+    nx.draw(G, pos = pos, nodelist=s_list, node_color = "red", node_size = 15, ax = ax1)
+    nx.draw(G, pos = pos, nodelist = r_list, node_color = "green", node_size = 15, ax=ax1)   
+    
+    return ax1.collections
+
+ani1 = animation.FuncAnimation(fig, animate_graph, fargs = (G, pos), interval = 200, blit = False, frames=num_iters)
+
+#SIR PLOT ANIMATION
 def animate_SIR(i, x, ignorant, spreader, stifler):
     line_I.set_data(x[:i], ignorant[:i]) #it is complaining about unexpected argument color here
     line_S.set_data(x[:i], spreader[:i])
