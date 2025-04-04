@@ -17,7 +17,7 @@ if plot_initial == True:
     plt.show()
     plt.close()
 
-beta = 0.5 #"infection" rate
+beta = 0.8 #"infection" rate
 gamma = 0.3 #"recovery" rate
 
 
@@ -28,10 +28,17 @@ for node in nodes:
     state.append((node, "I"))
 print(len(state))
 
-random_node = np.random.choice(list(G.nodes))
-print(f"the random spreader node is {random_node}")
-state = [(node, "S") if node == random_node else (node, "I") for node, _ in state]
-print(f"len state = {len(state)}")
+#here we can choose whether we want 1 node initially or if we want 5 nodes (possible interaction)
+one_node = False
+if one_node == True:
+    random_node = np.random.choice(list(G.nodes))
+    print(f"the random spreader node is {random_node}")
+    state = [(node, "S") if node == random_node else (node, "I") for node, _ in state]
+    print(f"len state = {len(state)}")
+else:
+    random_nodes = np.random.choice(list(G.nodes), size = 5)
+    print(f"the random spreader nodes are {random_nodes}")
+    state = [(node, "S") if node in random_nodes else (node, "I") for node, _ in state]
 
 #making a dictionary of the state
 state_dict = dict(state)
@@ -67,15 +74,15 @@ def update_rule(G):
     new_state = {}
 
     def assign_values(my_list):
-        mapping = {"S": 1, "I": 0, "R":0}
-        return list(map(mapping.get, my_list))
+                mapping = {"S": 1, "I": 0, "R":0}
+                return list(map(mapping.get, my_list))
     
     for node in G.nodes():
         #ignorant nodes: for every spreader node they have in their vicinity, they have a probability beta of becoming spreaders themselves
-        if state_dict[node] == "I":
+        if state[node] == "I":
             neighbors = list(G.neighbors(node))
             #now we access the state_dict 
-            values = list(map(state_dict.get, neighbors))
+            values = list(map(state.get, neighbors))
 
             #we apply a map to the values so we know what the probabilities we have are
             num_s = assign_values(values) #so now we have a list with all of the probabilities of becoming infected for all of the neighbors of a current node
@@ -88,24 +95,22 @@ def update_rule(G):
 
         
         #spreader node: has a probability gamma of becoming a stifler for every spreader it has in its neighborhood
-        if state_dict[node] == "S" or state_dict[node] == "R":
+        if state[node] == "S":
             neighbors = list(G.neighbors(node))
-            values = list(map(state_dict.get, neighbors))
-            #assign values so we know what probabilities we have
+            values = list(map(state.get, neighbors))
             num_s = assign_values(values)
 
-            rand_arr = np.random.uniform(0, 1, sum(num_s))
+            rand_arr = np.random.uniform(0, 1, sum(num_s)) #creating an array of random variables based on how many stiflers there are
             if np.any(rand_arr < gamma):
                 new_state[node] = "R"
             else:
-                if state_dict[node] == "S":
-                    new_state[node] = "S"
-                else:
-                    new_state[node] = "R"
+                new_state[node] = "S"
+        elif state[node] == "R":
+            new_state[node] = "R"
 
     return new_state
 
-num_iters = 10
+num_iters = 20
 
 def all_iters(num_iters):
     """
@@ -117,11 +122,12 @@ def all_iters(num_iters):
         new_state = update_rule(G)
         all_states.append(new_state)
         state_dict.update(new_state)
+        nx.set_node_attributes(G, state_dict, "state")
     return all_states
 
 time_arr = np.linspace(0, num_iters, num_iters) #x axis
 
-def extract_sir(all_states):
+def extract_sir():
     """
     Returns a tuple of the number of ignorant, spreader, and stifler nodes for all states for all iterations
     """
@@ -153,8 +159,7 @@ def extract_sir(all_states):
         iss.append(count_i)
     return rss, iss, sss 
 
-all_states = all_iters(num_iters)
-rss, iss, sss = extract_sir(all_states)
+rss, iss, sss = extract_sir()
 
 #now we can plot the graph of these versus iterations
 static = False
@@ -185,6 +190,9 @@ def animate_SIR(i, x, ignorant, spreader, stifler):
     line_S.set_data(x[:i], spreader[:i])
     line_R.set_data(x[:i], stifler[:i])
     return line_I, line_S, line_R,
+
+ax2.set_xlim(0, num_iters)
+ax2.set_ylim(0, 4100)
 
 ani2 = animation.FuncAnimation(fig, animate_SIR, fargs=(time_arr, iss, sss, rss), interval=200, blit=False, frames=num_iters)
 ax2.legend()
