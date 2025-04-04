@@ -60,6 +60,9 @@ if first_updated_plot == True:
 
 #one iteration of the update rule:
 def update_rule(G):
+    """
+    Returns the new state of a graph given the current graph.
+    """
     state = nx.get_node_attributes(G, "state")
     new_state = {}
 
@@ -102,42 +105,56 @@ def update_rule(G):
 
     return new_state
 
-pos = nx.spring_layout(G)
-all_states = []
 num_iters = 10
-for i in range(num_iters):
-    new_state = update_rule(G)
-    all_states.append(new_state)
-    state_dict.update(new_state)
 
-#print(all_states)
+def all_iters(num_iters):
+    """
+    Returns all of the states of the graph for the given number of iterations.
+    """
+    pos = nx.spring_layout(G)
+    all_states = []
+    for i in range(num_iters):
+        new_state = update_rule(G)
+        all_states.append(new_state)
+        state_dict.update(new_state)
+    return all_states
 
 time_arr = np.linspace(0, num_iters, num_iters) #x axis
-rss = [] #y
-iss = [] #y
-sss = [] #y
-for st in all_states:
-    value_counts = Counter(st.values())
-    print(value_counts) #the other ones that are not present here are I
-    #4039 nodes in total
 
-    #making sure it doesnt cause an error if there are no R or S nodes
-    try:
-        count_r = value_counts["R"]
-    except:
-        count_r = 0
-    rss.append(count_r)
+def extract_sir(all_states):
+    """
+    Returns a tuple of the number of ignorant, spreader, and stifler nodes for all states for all iterations
+    """
+    rss = [] #y
+    iss = [] #y
+    sss = [] #y
+    all_states = all_iters(num_iters)
+    for st in all_states:
+        value_counts = Counter(st.values())
+        print(value_counts) #the other ones that are not present here are I
+        #4039 nodes in total
 
-    try:
-        count_s = value_counts["S"]
-    except:
-        count_s = 0
-    sss.append(count_s)
+        #making sure it doesnt cause an error if there are no R or S nodes
+        try:
+            count_r = value_counts["R"]
+        except:
+            count_r = 0
+        rss.append(count_r)
 
-    #calculaging the number of ignorant (not present in new_state)
-    total_count_rs = count_r + count_s 
-    count_i = 4039 - total_count_rs
-    iss.append(count_i)
+        try:
+            count_s = value_counts["S"]
+        except:
+            count_s = 0
+        sss.append(count_s)
+
+        #calculaging the number of ignorant (not present in new_state)
+        total_count_rs = count_r + count_s 
+        count_i = 4039 - total_count_rs
+        iss.append(count_i)
+    return rss, iss, sss 
+
+all_states = all_iters(num_iters)
+rss, iss, sss = extract_sir(all_states)
 
 #now we can plot the graph of these versus iterations
 static = False
@@ -156,56 +173,25 @@ if static == True:
 #creating subplots:
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
 (plot_graph,) = ax1.plot([], []) #for the actual graph
-(plot_overtime,) = ax2.plot([], []) #for the plot ov SIR over time
+line_I, = ax2.plot([], [], color="blue", label="Ignorant")
+line_S, = ax2.plot([], [], color="red", label="Spreader")
+line_R, = ax2.plot([], [], color="green", label="Stifler") #for the plot ov SIR over time
 
 #for the animation:
 #need to at every time step save the network state but also the number of S, I, R for the other plot
 
-def animate_SIR(i, x, ignorant, spreader, stifler): #so i need something that returns ignorant, spreader, stifler numbers in total, like over the entire simulation life
-    plot_overtime.set_data(x[:i], ignorant[:i], color = "blue", label = "Ignorant") #x needs to be the time array, y needs to be the SIR... but we have 3 of them so idk how
-    plot_overtime.set_data(x[:i], spreader[:i], color = "red", label = "Spreader")
-    plot_overtime.set_data(x[:i], stifler[:i], color = "green", label = "Stifler")
-    return plot_overtime,
+def animate_SIR(i, x, ignorant, spreader, stifler):
+    line_I.set_data(x[:i], ignorant[:i]) #it is complaining about unexpected argument color here
+    line_S.set_data(x[:i], spreader[:i])
+    line_R.set_data(x[:i], stifler[:i])
+    return line_I, line_S, line_R,
 
+ani2 = animation.FuncAnimation(fig, animate_SIR, fargs=(time_arr, iss, sss, rss), interval=200, blit=False, frames=num_iters)
+ax2.legend()
+ax2.set_title("Ignorant (I), Spreader (S), and Stifler (R) Evolution")
+ax2.set_xlabel("Time")
+ax2.set_ylabel("Population")
 
-ani1 = animation.FuncAnimation(fig, animate_SIR, fargs=(time_arr, iss, sss, rss), interval=70, blit=False)
-ax1.legend()
-ax1.set_title("Ignorant (I), Spreader (S), and Stifler (R) Evolution")
-ax1.set_xlabel("Time")
-ax1.set_ylabel("Population")
-
-#ax1.plot(xx_nullcline_pts_sorted, xy_nullcline_pts_sorted, color = "red", label = "dx/dt nullcline", ls = ":")
-#ax1.plot(yx_nullcline_pts_sorted, yy_nullcline_pts_sorted, color = "green", label = "dy/dt nullcine", ls = ":")
-#ax1.scatter(fsolve_res[0], fsolve_res[1], color = "black", label = "fixed point")
-#ax1.set_xlabel("x")
-#ax1.set_ylabel("y")
-#ax1.legend()
-#ax1.set_title("Van der Pol Phase Plane")
 
 plt.tight_layout()
 plt.show()
-
-"""
-ignorant_nodes = []
-spreader_nodes = []
-rstifler_nodes = []
-for key, label in state_dict.items():
-    if label == "I":
-        ignorant_nodes.append(key)
-    elif label == "S":
-        spreader_nodes.append(key)
-    else:
-        rstifler_nodes.append(key)
-
-update_plot_two = True
-if update_plot_two == True:
-    nx.draw(G, pos = pos, nodelist = ignorant_nodes, node_color = "blue", node_size = 15)
-    nx.draw(G, pos = pos, nodelist=spreader_nodes, node_color = "red", node_size = 15)
-    nx.draw(G, pos = pos, nodelist=rstifler_nodes, node_color = "green", node_size = 15)
-    plt.title(f"Iteration {i}")
-    plt.show()
-    plt.close()
-
-print(state_dict)
-value_counts = Counter(state_dict.values())
-print(value_counts)"""
