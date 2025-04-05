@@ -5,7 +5,7 @@ import numpy as np
 from collections import Counter
 import matplotlib.animation as animation
 from matplotlib.backend_bases import MouseEvent #for user interaction
-from matplotlib.widgets import Slider
+from matplotlib.widgets import Button
 
 facebook = pd.read_csv("/Users/margheritatonon/applied_math_lab/networkx/facebook_combined.txt.gz", 
                        compression = "gzip", sep = " ", names = ["start_node", "end_node"])
@@ -14,15 +14,23 @@ G = nx.from_pandas_edgelist(facebook, "start_node", "end_node")
 original_G = G.copy()
 
 #creating subplots:
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
-gs = fig.add_gridspec(3, 2, height_ratios=[5, 0.3, 0.3])
-ax1 = fig.add_subplot(gs[0, 0])
-ax2 = fig.add_subplot(gs[0, 1])
 
-slider_ax = fig.add_subplot(gs[1, :])
-button_ax = fig.add_subplot(gs[2, :])
-slider = Slider(slider_ax, "Number of Initial Spreaders", 1, 20, valinit=1, valstep=1)
-num_spreaders = int(slider.val)
+fig = plt.figure(figsize=(14, 8))
+
+gs = fig.add_gridspec(2, 2, height_ratios=[5, 1])
+ax1 = fig.add_subplot(gs[0, 0])  # left: network
+ax2 = fig.add_subplot(gs[0, 1])  # right: SIR plot
+
+button_labels = [1, 5, 10, 20]
+button_axes = []
+buttons = []
+fig.text(0.35, 0.12, "Number of Initial Spreader Nodes", fontsize=12, weight="bold")
+
+for i, label in enumerate(button_labels):
+    ax = fig.add_axes([0.2 + 0.15 * i, 0.05, 0.1, 0.04])  # x, y, width, height
+    btn = Button(ax, label)
+    btn.label_text = label  # Store the label as an attribute for clarity
+    buttons.append(btn)
 
 (plot_graph,) = ax1.plot([], []) #for the actual graph
 line_I, = ax2.plot([], [], color="blue", label="Ignorant")
@@ -33,7 +41,7 @@ line_R, = ax2.plot([], [], color="green", label="Stifler") #for the plot ov SIR 
 beta = 0.8 #"infection" rate
 gamma = 0.3 #"recovery" rate
 pos = nx.spring_layout(G)
-num_iters = 20
+num_iters = 5
 time_arr = np.linspace(0, num_iters, num_iters) #x axis of plot
 
 def assign_values(my_list):
@@ -95,8 +103,7 @@ def all_iters(num_iters, beta, gamma):
     for i in range(num_iters):
         new_state = update_rule(G, beta, gamma)
         all_states.append(new_state)
-        state_dict.update(new_state)
-        nx.set_node_attributes(G, state_dict, "state")
+        nx.set_node_attributes(G, new_state, "state")
     return all_states
 
 
@@ -177,6 +184,7 @@ def combined_animation(i, G, pos, x, iss, sss, rss):
     return []
 
 
+ani = None
 def start_animation(val):
     global ani
     num_spreaders = int(val)
@@ -184,15 +192,16 @@ def start_animation(val):
     # Stop existing animation if running
     if ani is not None:
         ani.event_source.stop()
+        ani = None #this resets it
 
     run_simulation(num_spreaders)
 
     ani = animation.FuncAnimation(
-        fig, combined_animation, frames=num_iters, interval=70, blit=False, repeat=False
-    )
+        fig, combined_animation,fargs=(G, pos, time_arr, iss, sss, rss), frames=num_iters, interval=70, blit=False)
     fig.canvas.draw_idle()
 
-slider.on_changed(start_animation)
+for btn in buttons:
+    btn.on_clicked(lambda event, val=btn.label_text: start_animation(val))
 
 plt.tight_layout()
 plt.show()
