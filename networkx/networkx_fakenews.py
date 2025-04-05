@@ -29,7 +29,7 @@ for node in nodes:
 print(len(state))
 
 #here we can choose whether we want 1 node initially or if we want 5 nodes (possible interaction)
-one_node = False
+one_node = True
 if one_node == True:
     random_node = np.random.choice(list(G.nodes))
     print(f"the random spreader node is {random_node}")
@@ -192,7 +192,10 @@ pos = nx.spring_layout(G)
 #defining the animation function
 #all_states = all_iters(num_iters) --> we already have this defined above
 
-def animate_graph(i, G, pos):
+#nx.draw_networkx_edges(G, pos, ax=ax1, alpha=0.2) #drawing the edges
+"""def animate_graph(i, G, pos):
+    ax1.clear()
+    nx.draw_networkx_edges(G, pos, ax=ax1, alpha=0.2)
     curr_state = all_states[i] #this is the node number and the state it is
 
     #need to extract the S, I, R nodes from this dictionary
@@ -201,13 +204,13 @@ def animate_graph(i, G, pos):
     r_list = list(map(lambda keyval: keyval[0], filter(lambda keyval: keyval[1] == "R", curr_state.items())))
     
     #drawing
-    nx.draw(G, pos = pos, nodelist = i_list, node_color = "blue", node_size = 15, ax=ax1)
-    nx.draw(G, pos = pos, nodelist=s_list, node_color = "red", node_size = 15, ax = ax1)
-    nx.draw(G, pos = pos, nodelist = r_list, node_color = "green", node_size = 15, ax=ax1)   
+    nx.draw_networkx_nodes(G, pos = pos, nodelist = i_list, node_color = "blue", node_size = 15, ax=ax1)
+    nx.draw_networkx_nodes(G, pos = pos, nodelist=s_list, node_color = "red", node_size = 15, ax = ax1)
+    nx.draw_networkx_nodes(G, pos = pos, nodelist = r_list, node_color = "green", node_size = 15, ax=ax1)   
     
     return ax1.collections
 
-ani1 = animation.FuncAnimation(fig, animate_graph, fargs = (G, pos), interval = 200, blit = False, frames=num_iters)
+ani1 = animation.FuncAnimation(fig, animate_graph, fargs = (G, pos), interval = 70, blit = True, frames=num_iters)
 
 #SIR PLOT ANIMATION
 def animate_SIR(i, x, ignorant, spreader, stifler):
@@ -219,11 +222,40 @@ def animate_SIR(i, x, ignorant, spreader, stifler):
 ax2.set_xlim(0, num_iters)
 ax2.set_ylim(0, 4100)
 
-ani2 = animation.FuncAnimation(fig, animate_SIR, fargs=(time_arr, iss, sss, rss), interval=200, blit=False, frames=num_iters)
+ani2 = animation.FuncAnimation(fig, animate_SIR, fargs=(time_arr, iss, sss, rss), interval=70, blit=True, frames=num_iters)
 ax2.legend()
 ax2.set_title("Ignorant (I), Spreader (S), and Stifler (R) Evolution")
 ax2.set_xlabel("Time")
-ax2.set_ylabel("Population")
+ax2.set_ylabel("Population")"""
+
+#ANIMATION OF BOTH:
+def combined_animation(i, G, pos, x, iss, sss, rss):
+    curr_state = all_states[i]
+    i_list = [n for n, st in curr_state.items() if st == "I"]
+    s_list = [n for n, st in curr_state.items() if st == "S"]
+    r_list = [n for n, st in curr_state.items() if st == "R"]
+
+    ax1.clear()
+    nx.draw_networkx_edges(G, pos, ax=ax1, alpha=0.2)
+    nx.draw_networkx_nodes(G, pos=pos, nodelist=i_list, node_color="blue", node_size=15, ax=ax1)
+    nx.draw_networkx_nodes(G, pos=pos, nodelist=s_list, node_color="red", node_size=15, ax=ax1)
+    nx.draw_networkx_nodes(G, pos=pos, nodelist=r_list, node_color="green", node_size=15, ax=ax1)
+    ax1.set_title(f"Network at time {i}")
+
+    ax2.clear()
+    ax2.plot(x[:i], iss[:i], color="blue", label="Ignorant")
+    ax2.plot(x[:i], sss[:i], color="red", label="Spreader")
+    ax2.plot(x[:i], rss[:i], color="green", label="Stifler")
+    ax2.set_xlim(0, num_iters)
+    ax2.set_ylim(0, 4100)
+    ax2.set_title("SIR Evolution Over Time")
+    ax2.set_xlabel("Time")
+    ax2.set_ylabel("Population")
+    ax2.legend()
+
+    return []
+
+ani = animation.FuncAnimation(fig, combined_animation, fargs = (G, pos, time_arr, iss, sss, rss), frames=num_iters, interval=70, blit=False)
 
 
 plt.tight_layout()
