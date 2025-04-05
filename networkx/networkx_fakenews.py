@@ -110,7 +110,7 @@ def update_rule(G):
 
     return new_state
 
-num_iters = 5
+num_iters = 20
 
 def all_iters(num_iters):
     """
