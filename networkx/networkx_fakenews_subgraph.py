@@ -4,8 +4,7 @@ import pandas as pd
 import numpy as np
 from collections import Counter
 import matplotlib.animation as animation
-from matplotlib.backend_bases import MouseEvent #for user interaction
-from matplotlib.widgets import Button
+from matplotlib.widgets import Button, Slider
 
 #defining a function that will get a subgraph of G
 def get_subgraph(G, num_nodes):
@@ -33,18 +32,33 @@ full_G = nx.from_pandas_edgelist(facebook, "start_node", "end_node")
 G = get_subgraph(full_G, num_nodes=num_nodes_subgraph)  # You can tweak the number
 original_G = G.copy()
 
-#creating subplots:
+#the parameters:
+#beta = 0.8 #"infection" rate
+#gamma = 0.3 #"recovery" rate
+pos = nx.spring_layout(G)
+num_iters = 20
+time_arr = np.linspace(0, num_iters, num_iters) #x axis of plot
 
+#creating subplots:
 fig = plt.figure(figsize=(14, 8))
 
 gs = fig.add_gridspec(2, 2, height_ratios=[5, 1])
 ax1 = fig.add_subplot(gs[0, 0])  # left: network
 ax2 = fig.add_subplot(gs[0, 1])  # right: SIR plot
 
+#button
 button_labels = [1, 5, 10, 20]
 button_axes = []
 buttons = []
 fig.text(0.35, 0.12, "Number of Initial Spreader Nodes", fontsize=12, weight="bold")
+
+#sliders:
+ax_beta = fig.add_axes([0.1, 0.01, 0.35, 0.03])
+slider_beta = Slider(ax_beta, "Infection Rate", 0.0, 1.0, valinit=0, valstep=0.01)
+
+ax_gamma = fig.add_axes([0.6, 0.01, 0.35, 0.03])
+slider_gamma = Slider(ax_gamma, "Recovery Rate", 0.0, 1.0, valinit=0, valstep=0.01)
+
 
 for i, label in enumerate(button_labels):
     ax = fig.add_axes([0.2 + 0.15 * i, 0.05, 0.1, 0.04])  # x, y, width, height
@@ -57,12 +71,6 @@ line_I, = ax2.plot([], [], color="blue", label="Ignorant")
 line_S, = ax2.plot([], [], color="red", label="Spreader")
 line_R, = ax2.plot([], [], color="green", label="Stifler") #for the plot ov SIR over time
 
-#the parameters:
-beta = 0.8 #"infection" rate
-gamma = 0.3 #"recovery" rate
-pos = nx.spring_layout(G)
-num_iters = 20
-time_arr = np.linspace(0, num_iters, num_iters) #x axis of plot
 
 def assign_values(my_list):
     """
@@ -164,6 +172,8 @@ def run_simulation(num_spreaders):
     Runs the simulation.
     """
     global G, all_states, rss, iss, sss
+    beta = slider_beta.val
+    gamma = slider_gamma.val
     G = original_G.copy()
     nodes = G.nodes()
     state = {node: "I" for node in nodes} #giving ignorant to every node
@@ -188,7 +198,7 @@ def combined_animation(i, G, pos, x, iss, sss, rss):
     nx.draw_networkx_nodes(G, pos=pos, nodelist=i_list, node_color="blue", node_size=15, ax=ax1)
     nx.draw_networkx_nodes(G, pos=pos, nodelist=s_list, node_color="red", node_size=15, ax=ax1)
     nx.draw_networkx_nodes(G, pos=pos, nodelist=r_list, node_color="green", node_size=15, ax=ax1)
-    ax1.set_title(f"Network at time {i}")
+    #ax1.set_title(f"Network at time {i}")
 
     ax2.clear()
     ax2.plot(x[:i], iss[:i], color="blue", label="Ignorant")
@@ -196,7 +206,7 @@ def combined_animation(i, G, pos, x, iss, sss, rss):
     ax2.plot(x[:i], rss[:i], color="green", label="Stifler")
     ax2.set_xlim(0, num_iters)
     ax2.set_ylim(0, num_nodes_subgraph+10)
-    ax2.set_title("SIR Evolution Over Time")
+    #ax2.set_title("SIR Evolution Over Time")
     ax2.set_xlabel("Time")
     ax2.set_ylabel("Population")
     ax2.legend()
@@ -205,9 +215,11 @@ def combined_animation(i, G, pos, x, iss, sss, rss):
 
 
 ani = None
+last_spreader_value = 1
 def start_animation(val):
-    global ani
+    global ani, last_spreader_value
     num_spreaders = int(val)
+    last_spreader_value = num_spreaders
 
     # Stop existing animation if running
     if ani is not None:
@@ -222,6 +234,13 @@ def start_animation(val):
 
 for btn in buttons:
     btn.on_clicked(lambda event, val=btn.label_text: start_animation(val))
+
+
+def on_slider_change(val):
+    start_animation(last_spreader_value)  # rerun with updated beta/gamma and previous spreader count
+
+slider_beta.on_changed(on_slider_change)
+slider_gamma.on_changed(on_slider_change)
 
 plt.tight_layout()
 plt.show()
