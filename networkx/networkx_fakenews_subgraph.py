@@ -61,7 +61,7 @@ line_R, = ax2.plot([], [], color="green", label="Stifler") #for the plot ov SIR 
 beta = 0.8 #"infection" rate
 gamma = 0.3 #"recovery" rate
 pos = nx.spring_layout(G)
-num_iters = 5
+num_iters = 20
 time_arr = np.linspace(0, num_iters, num_iters) #x axis of plot
 
 def assign_values(my_list):
