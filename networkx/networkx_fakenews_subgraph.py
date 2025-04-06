@@ -232,9 +232,25 @@ def start_animation(val):
         fig, combined_animation,fargs=(G, pos, time_arr, iss, sss, rss), frames=num_iters, interval=70, blit=True)
     fig.canvas.draw_idle()
 
+
+#Key interactions
+is_paused = False 
+def on_key_press(event):
+    global is_paused, ani
+    if event.key == ' ':
+        if ani is not None:
+            if is_paused:
+                ani.event_source.start()
+            else:
+                ani.event_source.stop()
+            is_paused = not is_paused
+    elif event.key == 'enter':
+        start_animation(last_spreader_value)
+fig.canvas.mpl_connect('key_press_event', on_key_press)
+
+
 for btn in buttons:
     btn.on_clicked(lambda event, val=btn.label_text: start_animation(val))
-
 
 def on_slider_change(val):
     start_animation(last_spreader_value)  # rerun with updated beta/gamma and previous spreader count
