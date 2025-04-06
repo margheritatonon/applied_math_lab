@@ -39,8 +39,9 @@ pos = nx.spring_layout(G)
 num_iters = 20
 time_arr = np.linspace(0, num_iters, num_iters) #x axis of plot
 
-#creating subplots:
+#creating subplots: 
 fig = plt.figure(figsize=(14, 8))
+fig.suptitle("SIR Model Simulation on a Network (space to pause, enter to reset)", fontsize=16)
 
 gs = fig.add_gridspec(2, 2, height_ratios=[5, 1])
 ax1 = fig.add_subplot(gs[0, 0])  # left: network
