@@ -197,7 +197,7 @@ def start_animation(val):
     run_simulation(num_spreaders)
 
     ani = animation.FuncAnimation(
-        fig, combined_animation,fargs=(G, pos, time_arr, iss, sss, rss), frames=num_iters, interval=70, blit=False)
+        fig, combined_animation,fargs=(G, pos, time_arr, iss, sss, rss), frames=num_iters, interval=70, blit=True)
     fig.canvas.draw_idle()
 
 for btn in buttons:
